@@ -72,11 +72,23 @@ Type gxtkApp
 		Wend
 	EndMethod
 	
+	Method Die(o:Object)
+		dead = 1
+		gaudio.OnSuspend()
+		EndGraphics
+		ShowMouse()
+		printError(o)
+	EndMethod
+	
 	Method InvokeOnCreate()
 		If dead Return
-		dead = 1
-		OnCreate()
-		dead = 0
+		Try
+			dead = 1
+			OnCreate()
+			dead = 0
+		Catch o:Object
+			Die(o)
+		EndTry
 	EndMethod
 
 	Method InvokeOnUpdate()

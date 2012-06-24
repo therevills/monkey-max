@@ -8,6 +8,8 @@ Import glfw
 Import xna
 Import ios
 Import stdcpp
+Import metro
+Import pss
 Import bmax
 
 Function ValidTargets$()
@@ -24,6 +26,8 @@ Function ValidTargets$()
 	If XnaTarget.IsValid() valid.Push "xna"
 	If IosTarget.IsValid() valid.Push "ios"
 	If StdcppTarget.IsValid() valid.Push "stdcpp"
+	If MetroTarget.IsValid() valid.Push "metro"
+	If PssTarget.IsValid() valid.Push "pss"
 	If BmaxTarget.IsValid() valid.Push "bmax"
 	
 	ChangeDir cd
@@ -50,6 +54,10 @@ Function SelectTarget:Target( target$ )
 		Return New IosTarget
 	Case "stdcpp"
 		Return New StdcppTarget
+	Case "metro"
+		Return New MetroTarget
+	Case "pss"
+		Return New PssTarget
 	Case "bmax"
 		Return New BmaxTarget
 	Default

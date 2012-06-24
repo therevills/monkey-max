@@ -63,7 +63,17 @@ Class MyGame Extends App
 		MojoAudio()
 		If KeyHit(KEY_F1) Then SaveState(Rnd(100))
 		If KeyHit(KEY_F2) Then state = LoadState()
+		If KeyHit(KEY_E) Then
+			Local zero:Int = 5
+			Try
+				Print "Hello World!"
+				Throw New Throwable
+				Print "Where am I?"
+			Catch ex:Throwable
+				Print "Caught a Throwable!"
+			End
 
+		End
 		Return 0		
 	End
 	

@@ -10,6 +10,7 @@ Global JDK_PATH$
 Global FLEX_PATH$
 Global MINGW_PATH$
 Global MSBUILD_PATH$
+Global PSS_PATH$
 Global HTML_PLAYER$
 Global FLASH_PLAYER$
 Global BMAX_PATH$
@@ -302,9 +303,6 @@ Function ReplaceBlock$( text$,tag$,repText$,mark$="~n//" )
 
 	'find begin tag
 	Local beginTag:=mark+"${"+tag+"_BEGIN}"
-
-'	Print( "Trying to find " + beginTag + " in " + text )
-
 	Local i=text.Find( beginTag )
 	If i=-1 Die "Error updating target project - can't find block begin tag '"+tag+"'. You may need to delete target .build directory."
 	i+=beginTag.Length

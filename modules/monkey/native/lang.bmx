@@ -11,6 +11,30 @@ Function popErr()
 	_errStack.RemoveLast();
 EndFunction
 
+Function stackTrace:String()
+	if Not _errInfo.length Return ""
+	Local str:String = _errInfo+"~n"
+	Local _backwardsStack:TList = _errStack.Reversed()
+	For Local s:String = EachIn _backwardsStack
+		str :+ s +"~n"
+	Next
+	Return str
+EndFunction
+
+Function printError(err:Object)
+	If TBlitzException(err) Then
+		Local output:String = TBlitzException(err).ToString()
+		Notify(output)
+		print( "Monkey Runtime Error : "+output );
+		print( "" );
+		print( stackTrace() );
+	Else
+		Notify (err.ToString())
+		print( "" );
+		print( stackTrace() );
+	EndIf
+EndFunction
+
 Function error( err:String )
 	If err = "" Then
 		End
@@ -140,6 +164,12 @@ Function slice_string:String(arr:String, from:Int, term:Int = 0)
 	Return Mid(arr, from + 1,  term - from)
 
 EndFunction
+
+Type ThrowableObject
+	Method toString:String()
+		Return "Uncaught Monkey Exception"
+	EndMethod
+EndType
 
 ' ***** End lang.bmx ******
 

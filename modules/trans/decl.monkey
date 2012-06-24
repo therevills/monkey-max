@@ -12,6 +12,7 @@ Const DECL_ABSTRACT=	$000400
 Const DECL_FINAL=		$000800
 
 Const CLASS_INTERFACE=	$001000
+Const CLASS_THROWABLE=	$002000
 
 Const DECL_SEMANTED=	$100000
 Const DECL_SEMANTING=	$200000
@@ -416,7 +417,7 @@ Public
 		Else
 			Err "Duplicate identifier '"+ident+"'."
 		Endif
-
+		
 		If decl.IsSemanted() semanted.AddLast decl ' Added for MonkeyMax
 	End
 
@@ -438,9 +439,20 @@ Public
 	End
 	
 	Method FindDecl:Object( ident$ )
+	
+		If _env<>Self Return GetDecl( ident )
+		
+		Local tscope:=Self
+		While tscope
+			Local decl:=tscope.GetDecl( ident )
+			If decl Return decl
+			tscope=tscope.scope
+		Wend
+#rem
 		Local decl:=GetDecl( ident )
 		If decl Return decl
 		If scope Return scope.FindDecl( ident )
+#end
 	End
 	
 	Method FindValDecl:ValDecl( ident$ )
@@ -485,15 +497,6 @@ Public
 			scope.Semant
 			Return scope
 		Endif
-#rem	
-		Local decl:=ScopeDecl( FindDecl( ident ) )
-		If Not decl Return
-		Local cdecl:=ClassDecl( decl )
-		If cdecl And cdecl.args Return
-		decl.AssertAccess
-		decl.Semant
-		Return decl
-#end
 	End
 	
 	Method FindModuleDecl:ModuleDecl( ident$ )
@@ -892,26 +895,32 @@ Class ClassDecl Extends ScopeDecl
 		Return (attrs & CLASS_FINALIZED)<>0
 	End
 	
+	Method IsThrowable()
+		Return (attrs & CLASS_THROWABLE)<>0
+	End
+	
 	Method ExtendsObject()
 		Return (attrs & CLASS_EXTENDSOBJECT)<>0
 	End
 	
 	Method GetDecl:Object( ident$ )
-	
 		Local cdecl:ClassDecl=Self
 		While cdecl
 			Local decl:=cdecl.GetDecl2( ident )
 			If decl Return decl
-			
 			cdecl=cdecl.superClass
 		Wend
-
 	End
 	
 	'needs this 'coz you can't go blah.Super.GetDecl()...
 	Method GetDecl2:Object( ident$ )
 		Return Super.GetDecl( ident )
 	End
+	
+'	Method FindDecl:Object( ident$ )
+'		If _env=Self Return Super.FindDecl( ident )
+'		Return GetDecl( ident )
+'	End
 	
 	Method FindFuncDecl:FuncDecl( ident$,args:Expr[],explicit=False )
 	
@@ -976,12 +985,13 @@ Class ClassDecl Extends ScopeDecl
 		If args Return
 	
 		PushEnv Self
-
+		
 		'Semant superclass		
 		If superTy
 			superClass=superTy.SemantClass()
 			If superClass.IsFinal() Err "Cannot extend final class."
 			If superClass.IsInterface() Err "Cannot extend an interface."
+			If munged="ThrowableObject" Or superClass.IsThrowable() attrs|=CLASS_THROWABLE
 			If superClass.ExtendsObject() attrs|=CLASS_EXTENDSOBJECT
 		Else
 			If munged="Object" attrs|=CLASS_EXTENDSOBJECT
@@ -1056,7 +1066,7 @@ Class ClassDecl Extends ScopeDecl
 				InsertDecl fdecl
 			Endif
 		Endif
-
+		
 		'NOTE: do this AFTER super semant so UpdateAttrs order is cool.
 		AppScope.semantedClasses.AddLast Self
 	End
@@ -1140,7 +1150,10 @@ Class ClassDecl Extends ScopeDecl
 			Local cdecl:=superClass
 			While cdecl
 				For Local decl:=Eachin cdecl.Semanted
-					If decl.ident=fdecl.ident Err "Field '"+fdecl.ident+"' in class "+ToString()+" overrides existing declaration in class "+cdecl.ToString()
+					If decl.ident=fdecl.ident 
+						_errInfo=fdecl.errInfo
+						Err "Field '"+fdecl.ident+"' in class "+ToString()+" overrides existing declaration in class "+cdecl.ToString()
+					Endif
 				Next
 				cdecl=cdecl.superClass
 			Wend

@@ -6,7 +6,7 @@
 
 Import targets
 
-Const VERSION$="1.32"
+Const VERSION$="1.36"
 
 Function StripQuotes$( str$ )
 	If str.StartsWith( "~q" ) And str.EndsWith( "~q" ) Return str[1..-1]
@@ -76,6 +76,10 @@ Function LoadConfig()
 		Case "MINGW_PATH"
 			If Not MINGW_PATH And FileType( path )=FILETYPE_DIR
 				MINGW_PATH=path
+			Endif
+		Case "PSS_PATH"
+			If Not PSS_PATH And FileType( path )=FILETYPE_DIR
+				PSS_PATH=path
 			Endif
 		Case "MSBUILD_PATH"
 			If Not MSBUILD_PATH And FileType( path )=FILETYPE_FILE

@@ -60,7 +60,11 @@ Class Translator
 	Method TransRepeatStmt$( stmt:RepeatStmt ) Abstract
 
 	Method TransForStmt$( stmt:ForStmt ) Abstract
+	
+	Method TransTryStmt$( stmt:TryStmt ) Abstract
 
+	Method TransThrowStmt$( stmt:ThrowStmt ) Abstract
+	
 	'***** Decls *****
 		
 	Method TransBlock$( block:BlockDecl ) Abstract
@@ -83,6 +87,9 @@ Class CTranslator Extends Translator
 	'***** Utility *****
 	
 	Method TransValue$( ty:Type,value$ ) Abstract
+	
+	Method TransCatchVar$( init:LocalDecl )
+	End
 
 	Method TransLocalDecl$( munged$,init:Expr ) Abstract
 	
@@ -323,10 +330,16 @@ Class CTranslator Extends Translator
 		Return tmp.munged
 	End
 	
-	Method EmitEnter( func$ )
+	Method EmitEnter( func:FuncDecl )
+	End
+	
+	Method EmitEnterBlock()
 	End
 	
 	Method EmitSetErr( errInfo$ )
+	End
+	
+	Method EmitLeaveBlock()
 	End
 	
 	Method EmitLeave()
@@ -446,7 +459,6 @@ Class CTranslator Extends Translator
 			indent=indent[..indent.Length-1]
 		Endif
 		lines.AddLast indent+t
-		'code+=indent+t+"~n"
 		If t.EndsWith( "{" )
 			indent+="~t"
 		Endif
@@ -459,11 +471,12 @@ Class CTranslator Extends Translator
 	End
 	
 	Method TransBlock$( block:BlockDecl )
-		EmitBlock block
+		EmitBlock block,False
 	End
 	
 	'returns unreachable status!
-	Method EmitBlock( block:BlockDecl )
+	'
+	Method EmitBlock( block:BlockDecl,realBlock?=True )
 	
 		PushEnv block
 		
@@ -472,8 +485,9 @@ Class CTranslator Extends Translator
 		If func
 			emitDebugInfo=ENV_CONFIG<>"release"
 			If func.attrs & DECL_NODEBUG emitDebugInfo=False
-			
-			If emitDebugInfo EmitEnter func.scope.ident+"."+func.ident
+			If emitDebugInfo EmitEnter func
+		Else
+			If emitDebugInfo And realBlock EmitEnterBlock
 		Endif
 
 		For Local stmt:Stmt=Eachin block.stmts
@@ -486,7 +500,9 @@ Class CTranslator Extends Translator
 				Local rs:=ReturnStmt( stmt )
 				If rs
 					If rs.expr
-						EmitSetErr stmt.errInfo
+						'
+						If stmt.errInfo EmitSetErr stmt.errInfo
+						'
 						Local t_expr:=TransExprNS( rs.expr )
 						EmitLeave
 						Emit "return "+t_expr+";"
@@ -497,7 +513,9 @@ Class CTranslator Extends Translator
 					unreachable=True
 					Continue
 				Endif
-				EmitSetErr stmt.errInfo
+				'
+				If stmt.errInfo EmitSetErr stmt.errInfo
+				'
 			Endif
 			
 			Local t$=stmt.Trans()
@@ -505,35 +523,41 @@ Class CTranslator Extends Translator
 			
 		Next
 		
+		_errInfo=""
+		
 		Local unr=unreachable
 		unreachable=False
 		
-		If func
-			If unr
-				'Actionscript's reachability analysis ain't so hot...tack on a return
-				'just in case.
-				If ENV_LANG="as" And Not VoidType( func.retType )
-					If block.stmts.IsEmpty() Or Not ReturnStmt( block.stmts.Last() )
-						Emit "return "+TransValue( func.retType,"" )+";"
-					Endif
-				Endif
-			Else
-				If emitDebugInfo EmitLeave
-				
-				If Not VoidType( func.retType )
-					If func.IsCtor()
-						Emit "return this;"
-					Else
-						If func.ModuleScope().IsStrict()
-							_errInfo=func.errInfo
-							Err "Missing return statement."
-						Endif
-						Emit "return "+TransValue( func.retType,"" )+";"
-					Endif
+		If unr
+
+			'Actionscript's reachability analysis is...weird.
+			If func And ENV_LANG="as" And Not VoidType( func.retType )
+				If block.stmts.IsEmpty() Or Not ReturnStmt( block.stmts.Last() )
+					Emit "return "+TransValue( func.retType,"" )+";"
 				Endif
 			Endif
-		Endif
 		
+		Else If func
+		
+			If emitDebugInfo EmitLeave
+			
+			If Not VoidType( func.retType )
+				If func.IsCtor()
+					Emit "return this;"
+				Else
+					If func.ModuleScope().IsStrict()
+						_errInfo=func.errInfo
+						Err "Missing return statement."
+					Endif
+					Emit "return "+TransValue( func.retType,"" )+";"
+				Endif
+			Endif
+		Else
+
+			If emitDebugInfo And realBlock EmitLeaveBlock
+
+		Endif
+
 		PopEnv
 		
 		Return unr
@@ -553,12 +577,19 @@ Class CTranslator Extends Translator
 	End
 	
 	Method TransIfStmt$( stmt:IfStmt )
-		
 		If ConstExpr( stmt.expr )
 			If ConstExpr( stmt.expr ).value
-				If EmitBlock( stmt.thenBlock ) unreachable=True
-			Else If Not stmt.elseBlock.stmts.IsEmpty()
-				If EmitBlock( stmt.elseBlock ) unreachable=True
+				If Not stmt.thenBlock.stmts.IsEmpty()
+					Emit "if(true){"
+					If EmitBlock( stmt.thenBlock ) unreachable=True
+					Emit "}"
+				Endif
+			Else
+				If Not stmt.elseBlock.stmts.IsEmpty()
+					Emit "if(true){"
+					If EmitBlock( stmt.elseBlock ) unreachable=True
+					Emit "}"
+				Endif
 			Endif
 		Else If Not stmt.elseBlock.stmts.IsEmpty()
 			Emit "if"+Bra( stmt.expr.Trans() )+"{"
@@ -609,6 +640,15 @@ Class CTranslator Extends Translator
 		
 		If broken=nbroken And ConstExpr( stmt.expr ) And ConstExpr( stmt.expr ).value unreachable=True
 		broken=nbroken
+	End
+
+	Method TransTryStmt$( stmt:TryStmt )
+		Err "TODO!"
+	End
+	
+	Method TransThrowStmt$( stmt:ThrowStmt )
+		unreachable=True
+		Return "throw "+stmt.expr.Trans()
 	End
 	
 	Method PostProcess$( source$ ) 

@@ -238,7 +238,7 @@ Class BmxTranslator Extends CTranslator
 		Return "local "+munged+":"+TransType( init.exprType )+"="+init.Trans()
 	End
 
-	Method EmitEnter( func$ )
+	Method EmitEnter( func:FuncDecl )
 		Emit "pushErr();"
 	End
 	
@@ -527,7 +527,9 @@ Class BmxTranslator Extends CTranslator
 		'global functions
 		Case "print" Return "print("+arg0+")" ' done
 		Case "error" Return "error("+arg0+")"
-		
+		Case "debuglog" Return "debugLog"+Bra( arg0 )
+		Case "debugstop" Return "debugStop()"
+
 		'string/array methods
 		Case "length" Return texpr+".length" ' tested and works
 		
@@ -595,6 +597,17 @@ Class BmxTranslator Extends CTranslator
 	
 	'***** Statements *****
 
+	Method TransTryStmt$( stmt:TryStmt )
+		Emit "Try"
+		Local unr:=EmitBlock( stmt.block )
+		For Local c:=Eachin stmt.catches
+			MungDecl c.init
+			Emit "Catch "+c.init.munged+":"+TransType( c.init.type )
+			Local unr:=EmitBlock( c.block )
+		Next
+		Emit "EndTry"
+	End
+	
 	Method TransAssignStmt$( stmt:AssignStmt )
 	#rem
 		If ENV_CONFIG="debug"
@@ -724,7 +737,7 @@ Class BmxTranslator Extends CTranslator
 		EndLocalScope		
 '		PopMungScope
 	End
-	
+#rem	
 	'returns unreachable status!
 	Method EmitBlock( block:BlockDecl )
 	
@@ -794,41 +807,130 @@ Class BmxTranslator Extends CTranslator
 		
 		Return r
 	End
+#end
+	'returns unreachable status!
+	'
+	Method EmitBlock( block:BlockDecl,realBlock?=True )
 	
-Method Enquote$( str$ )
-	str=str.Replace( "~~","~~~~" )
-	str=str.Replace( "~q","~~q" )
-	str=str.Replace( "~n","~~n" )
-	str=str.Replace( "~r","~~r" )
-	str=str.Replace( "~t","~~t" )
-	
-	For Local i=0 Until str.Length
-		If str[i]>=32 And str[i]<128 Continue
-		Local t$,n=str[i]
-		While n
-			Local c=(n&15)+48
-			If c>=58 c+=97-58
-			t=String.FromChar( c )+t
-			n=(n Shr 4) & $0fffffff
-		Wend
-		If Not t t="0"
+		PushEnv block
+		
+		Local func:=FuncDecl( block )
+		
+		If func
+			emitDebugInfo=ENV_CONFIG<>"release"
+			If func.attrs & DECL_NODEBUG emitDebugInfo=False
+			If emitDebugInfo EmitEnter func
+		Else
+			If emitDebugInfo And realBlock EmitEnterBlock
+		Endif
+
+		For Local stmt:Stmt=Eachin block.stmts
+		
+			_errInfo=stmt.errInfo
+			
+			If unreachable Exit
+
+			If emitDebugInfo
+				Local rs:=ReturnStmt( stmt )
+				If rs
+					If rs.expr
+						'
+						If stmt.errInfo EmitSetErr stmt.errInfo
+						'
+						Local t_expr:=TransExprNS( rs.expr )
+						EmitLeave
+						Emit "Return "+t_expr+";"
+					Else
+						EmitLeave
+						Emit "Return;"
+					Endif
+					unreachable=True
+					Continue
+				Endif
+				'
+				If stmt.errInfo EmitSetErr stmt.errInfo
+				'
+			Endif
+			
+			Local t$=stmt.Trans()
+			If t Emit t
+			
+		Next
+		
+		_errInfo=""
+		
+		Local unr=unreachable
+		unreachable=False
+		
+		If unr
+
+			'Actionscript's reachability analysis is...weird.
+			If func And ENV_LANG="as" And Not VoidType( func.retType )
+				If block.stmts.IsEmpty() Or Not ReturnStmt( block.stmts.Last() )
+					Emit "Return "+TransValue( func.retType,"" )
+				Endif
+			Endif
+		
+		Else If func
+		
+			If emitDebugInfo EmitLeave
+			
+			If Not VoidType( func.retType )
+				If func.IsCtor()
+					Emit "return Self"
+				Else
+					If func.ModuleScope().IsStrict()
+						_errInfo=func.errInfo
+						Err "Missing return statement."
+					Endif
+					Emit "Return "+TransValue( func.retType,"" )
+				Endif
+			Endif
+		Else
+
+			If emitDebugInfo And realBlock EmitLeaveBlock
+
+		Endif
+
+		PopEnv
+		
+		Return unr
+	End
+
+	Method Enquote$( str$ )
+		str=str.Replace( "~~","~~~~" )
+		str=str.Replace( "~q","~~q" )
+		str=str.Replace( "~n","~~n" )
+		str=str.Replace( "~r","~~r" )
+		str=str.Replace( "~t","~~t" )
+		
+		For Local i=0 Until str.Length
+			If str[i]>=32 And str[i]<128 Continue
+			Local t$,n=str[i]
+			While n
+				Local c=(n&15)+48
+				If c>=58 c+=97-58
+				t=String.FromChar( c )+t
+				n=(n Shr 4) & $0fffffff
+			Wend
+			If Not t t="0"
+			Select ENV_LANG
+			Case "cpp"
+				t="~qL~q\x"+t+"~qL~q"
+			Default
+				t="\u"+("0000"+t)[-4..]
+			End
+			str=str[..i]+t+str[i+1..]
+			i+=t.Length-1
+		Next
 		Select ENV_LANG
 		Case "cpp"
-			t="~qL~q\x"+t+"~qL~q"
+			str="L~q"+str+"~q"
 		Default
-			t="\u"+("0000"+t)[-4..]
+			str="~q"+str+"~q"
 		End
-		str=str[..i]+t+str[i+1..]
-		i+=t.Length-1
-	Next
-	Select ENV_LANG
-	Case "cpp"
-		str="L~q"+str+"~q"
-	Default
-		str="~q"+str+"~q"
+		Return str
 	End
-	Return str
-End
 
 	Method Emit( t$ )
 		If Not t Return
@@ -1248,4 +1350,3 @@ End
 	End
 	
 End
-
