@@ -3,7 +3,9 @@ Strict
 #BMAX_WINDOW_TITLE="Mojo Test"
 #BMAX_WINDOW_WIDTH=1024
 #BMAX_WINDOW_HEIGHT=768
-#BMAX_WINDOW_FULLSCREEN="True"
+#BMAX_WINDOW_FULLSCREEN="False"
+#MOJO_IMAGE_FILTERING_ENABLED="True"
+#MOJO_AUTO_SUSPEND_ENABLED="True"
 
 Import mojo
 
@@ -126,7 +128,9 @@ Class MyGame Extends App
 						
 		DrawImage(img, 10, 64)
 		SetColor(255,255,0)
+		Scale 2, 2
 		spr.Draw()
+		Scale 1, 1
 		SetColor(255,0,255)
 		DrawLine(0, 0, DeviceWidth(), DeviceHeight())
 		SetColor(0,255,255)

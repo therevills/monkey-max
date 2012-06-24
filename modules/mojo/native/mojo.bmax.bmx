@@ -39,16 +39,18 @@ Type gxtkApp
 	
 	Method Update()
 		While Not AppTerminate()
-			While PeekEvent()
-				PollEvent()
-				Select EventID()
-					Case EVENT_APPSUSPEND
-						If Not suspended Then InvokeOnSuspend()
-					Case EVENT_APPRESUME
-						If suspended Then InvokeOnResume()
-				End Select
-			Wend
-
+			If Upper(MOJO_AUTO_SUSPEND_ENABLED) = "TRUE" Then
+				While PeekEvent()
+					PollEvent()
+					Select EventID()
+						Case EVENT_APPSUSPEND
+							If Not suspended Then InvokeOnSuspend()
+						Case EVENT_APPRESUME
+							If suspended Then InvokeOnResume()
+					EndSelect
+				Wend
+			EndIf
+			
 			If Not updatePeriod return
 			Local updates:Int = 0
 			
@@ -212,7 +214,11 @@ Type gxtkGraphics
 	EndMethod
 	
 	Method LoadSurface:gxtkSurface(path:String)
-		Local image:TImage = LoadImage("data/"+path)
+		Local flags:Int = MASKEDIMAGE
+		If Upper(MOJO_IMAGE_FILTERING_ENABLED) = "TRUE" Then
+			flags = flags | FILTEREDIMAGE
+		EndIf
+		Local image:TImage = LoadImage("data/"+path, flags)
 		If image Then
 			Local gs:gxtkSurface = New gxtkSurface
 			gs.setImage(image)
@@ -437,7 +443,7 @@ Type gxtkAudio
 				chan.channel.SetPaused(True)
 			EndIf
 		Next
-	End Method
+	EndMethod
 
 	Method OnResume()
 		For Local i:Int = 0 To 33 - 1
@@ -446,7 +452,7 @@ Type gxtkAudio
 				chan.channel.SetPaused(False)
 			EndIf
 		Next
-	End Method
+	EndMethod
 	
 	Method MusicState:Int()
 		' Monkey Docs: 	0 if the music is currently stopped
@@ -632,7 +638,7 @@ Function BlitzMaxSetBlend(blend:Int)
 			SetBlend( ALPHABLEND )
 		Case 1
 			SetBlend( LIGHTBLEND )
-	End Select
+	EndSelect
 EndFunction
 
 Function BlitzMaxSetAlpha(a:Float)
@@ -661,6 +667,7 @@ Type gxtkSurface
 	EndMethod
 	
 	Method Discard()
+		Self.image = Null
 	EndMethod
 EndType
 
