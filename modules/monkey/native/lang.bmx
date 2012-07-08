@@ -12,7 +12,7 @@ Function popErr()
 EndFunction
 
 Function stackTrace:String()
-	if Not _errInfo.length Return ""
+	If Not _errInfo.length Return ""
 	Local str:String = _errInfo+"~n"
 	Local _backwardsStack:TList = _errStack.Reversed()
 	For Local s:String = EachIn _backwardsStack
@@ -25,13 +25,13 @@ Function printError(err:Object)
 	If TBlitzException(err) Then
 		Local output:String = TBlitzException(err).ToString()
 		Notify(output)
-		print( "Monkey Runtime Error : "+output );
-		print( "" );
-		print( stackTrace() );
+		Print( "Monkey Runtime Error : "+output );
+		Print( "" );
+		Print( stackTrace() );
 	Else
 		Notify (err.ToString())
-		print( "" );
-		print( stackTrace() );
+		Print( "" );
+		Print( stackTrace() );
 	EndIf
 EndFunction
 
@@ -43,12 +43,12 @@ Function error( err:String )
 	EndIf
 EndFunction
 
-Function debugLog:Int( str:String )
+Function DebugLog:Int( str:String )
 	Print(str)
 	Return 0
 EndFunction
 
-Function debugStop:Int()
+Function DebugStop:Int()
 	error("STOP")
 	Return 0
 EndFunction
@@ -145,7 +145,9 @@ Function resize_array_array_String:String[][]( arr:String[][], leng:Int )
 	Return arr;
 EndFunction
 
-Function slice_string:String(arr:String, from:Int, term:Int = 0)
+' From the BMax help: "If EndIndex is omitted, it defaults to the length of the string"
+' It can't default to 0 since it ought to be able to slice a string such that [..0] -> ""
+Function slice_string:String(arr:String, from:Int, term:Int = 2147483647)
 	Local le:Int = arr.Length
 
 	If from < 0
@@ -154,13 +156,16 @@ Function slice_string:String(arr:String, from:Int, term:Int = 0)
 	Else If from > le
 		from = le
 	EndIf
-	If term <= 0
+	If term < 0
 		term :+ le
 	Else If term > le
 		term = le
 	EndIf
 
-	If term <= from Return arr
+	' From the BMax help: "The length of the returned slice is always ( EndIndex - StartIndex ) elements long"
+	' Thus, term = from should give a string of length 0
+	If term = from Return ""
+	If term < from Return arr
 	Return Mid(arr, from + 1,  term - from)
 
 EndFunction
