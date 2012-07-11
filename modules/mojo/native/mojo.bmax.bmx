@@ -481,6 +481,7 @@ Type gxtkAudio
 	
 	Method PlayMusic:Int( path:String, flags:Int )
 		StopMusic()
+		channels[MUSIC_CHANNEL].channel = AllocChannel()
 		music = LoadSample( path )
 		If Not music Then Return -1
 		
