@@ -2,6 +2,11 @@ set OLDDIR=%CD%
 
 %OLDDIR%\..\bin\trans_winnt.exe -build -config=release -target=stdcpp %OLDDIR%\trans\trans.monkey
 @echo off
+if errorlevel 1 goto FAIL
+if errorlevel 0 goto CONTINUE
+goto END
+:CONTINUE
+
 for /f "tokens=1-4 delims=/ " %%a in ('date /t') do (
  set dd=%%b
  set mo=%%c
@@ -27,5 +32,9 @@ COPY "%OLDDIR%\trans\trans.build\stdcpp\trans_winnt.exe" %OLDDIR%\..\bin\"
 echo.
 echo.
 echo DONE!
-
+goto END
+:FAIL
+echo: Error!
+goto END
+:END
 pause
