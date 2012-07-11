@@ -671,6 +671,10 @@ Type gxtkSurface
 		Self.image = image
 	EndMethod
 	
+	Method Discard()
+		Self.image = Null
+	EndMethod
+	
 	Method Width:Int()
 		Return image.Width
 	EndMethod
@@ -678,9 +682,9 @@ Type gxtkSurface
 	Method Height:Int()
 		Return image.Height
 	EndMethod
-	
-	Method Discard()
-		Self.image = Null
+
+	Method Loaded:Int()
+		Return 1
 	EndMethod
 EndType
 

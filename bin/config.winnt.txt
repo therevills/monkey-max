@@ -24,6 +24,8 @@ HTML_PLAYER="${TRANSDIR}\mserver_winnt.exe"
 '
 ANT_PATH="${SYSTEMDRIVE}\apache-ant-1.8.2"
 ANT_PATH="${SYSTEMDRIVE}\ant"
+ANT_PATH="E:\Programming\apache-ant-1.8.2"
+
 '--------------------
 
 '--------------------
@@ -52,6 +54,8 @@ JDK_PATH="${PROGRAMFILES}\Java\jdk1.7.0_02"
 JDK_PATH="${PROGRAMFILES}\Java\jdk1.6.0_23"
 JDK_PATH="${PROGRAMFILES}\Java\jdk1.6.0_21"
 JDK_PATH="${PROGRAMFILES}\Java\jdk1.6.0_19"
+JDK_PATH="C:\Program Files\Java\jdk1.6.0_24"
+
 '--------------------
 
 '--------------------
@@ -63,6 +67,8 @@ JDK_PATH="${PROGRAMFILES}\Java\jdk1.6.0_19"
 '	http://developer.android.com/sdk/index.html
 '
 ANDROID_PATH="${SYSTEMDRIVE}\android-sdk-windows"
+ANDROID_PATH="C:\Program Files (x86)\Android\android-sdk"
+
 '--------------------
 
 '--------------------
