@@ -12,8 +12,8 @@ Type gxtkApp
 	Field vloading:Int=0
 	Field maxloading:Int=0
 	Field updateRate:Int=0
-	Field nextUpdate:Float=0
-	Field updatePeriod:Float=0
+	Field nextUpdate:Double=0
+	Field updatePeriod:Double=0
 	Field startMillis:Float=0
 	
 	Method New()' gxtkApp()
