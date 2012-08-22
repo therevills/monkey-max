@@ -111,6 +111,12 @@ Type diddy
 		Return 0
 	EndFunction
 	
+	Function mouseZInit()
+	EndFunction
+
+	Function mouseZ:Float()
+		Return 0
+	EndFunction
 EndType
 
 Function BlitzMaxFlushKeys()
@@ -124,4 +130,3 @@ EndFunction
 Function BlitzMaxHideMouse()
 	HideMouse()
 EndFunction
-

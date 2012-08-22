@@ -11,6 +11,7 @@ Global FLEX_PATH$
 Global MINGW_PATH$
 Global MSBUILD_PATH$
 Global PSS_PATH$
+Global PSM_PATH$
 Global HTML_PLAYER$
 Global FLASH_PLAYER$
 Global BMAX_PATH$

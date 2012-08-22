@@ -9,7 +9,7 @@ Import xna
 Import ios
 Import stdcpp
 Import metro
-Import pss
+Import psm
 Import bmax
 
 Function ValidTargets$()
@@ -27,7 +27,7 @@ Function ValidTargets$()
 	If IosTarget.IsValid() valid.Push "ios"
 	If StdcppTarget.IsValid() valid.Push "stdcpp"
 	If MetroTarget.IsValid() valid.Push "metro"
-	If PssTarget.IsValid() valid.Push "pss"
+	If PsmTarget.IsValid() valid.Push "psm"
 	If BmaxTarget.IsValid() valid.Push "bmax"
 	
 	ChangeDir cd
@@ -56,8 +56,8 @@ Function SelectTarget:Target( target$ )
 		Return New StdcppTarget
 	Case "metro"
 		Return New MetroTarget
-	Case "pss"
-		Return New PssTarget
+	Case "psm"
+		Return New PsmTarget
 	Case "bmax"
 		Return New BmaxTarget
 	Default
