@@ -1,3 +1,5 @@
+Global diddy_mouseWheel:Float = 0.0
+
 Type diddy
 	Function systemMillisecs:Float()
 		Return Millisecs()
@@ -115,9 +117,15 @@ Type diddy
 	EndFunction
 
 	Function mouseZ:Float()
-		Return 0
+		Local ret:Float = BlitzMaxMouseZ() - diddy_mouseWheel
+		diddy_mouseWheel = BlitzMaxMouseZ()
+		Return ret
 	EndFunction
 EndType
+
+Function BlitzMaxMouseZ:Float()
+	Return MouseZ()
+EndFunction
 
 Function BlitzMaxFlushKeys()
 	FlushKeys()

@@ -311,6 +311,22 @@ Type gxtkGraphics
 		DrawSubImageRect(surface.image, nx, ny, srcw, srch, srcx, srcy, srcw, srch)		
 		Return 0
 	EndMethod
+
+	Method CreateSurface:gxtkSurface( width:Int, height:Int )
+		Local img:Timage = BlitzMaxCreateImage(width, height)
+		Local gs:gxtkSurface = New gxtkSurface
+		gs.setImage(img)
+		Return gs
+	EndMethod
+
+	
+	Method ReadPixels:Int( pixels:Int[], x:Int, y:Int, width:Int, height:Int, offset:Int, pitch:Int )
+		Return 0
+	EndMethod
+	
+	Method WritePixels2:Int( surface:gxtkSurface, pixels:Int[], x:Int, y:Int, width:Int, height:Int, offset:Int, pitch:Int )
+		Return 0
+	EndMethod
 	
 	Method DrawLine:Int( x1:Float,y1:Float,x2:Float,y2:Float )
 		Local nx1:Float = TransX(x1,y1)
@@ -616,6 +632,11 @@ Type gxtkSample
 		Self.sound = null
 	EndMethod
 EndType
+
+Function BlitzMaxCreateImage:TImage(width:Int, height:Int, frames:Int = 1, flags:Int = -1)
+	Local image:TImage = CreateImage(width, height, frames, flags)
+	Return image
+EndFunction
 
 Function BlitzMaxDrawPoly:Int(vertices:Float[])
 	DrawPoly vertices
