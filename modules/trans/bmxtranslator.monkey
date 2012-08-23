@@ -316,7 +316,6 @@ Class BmxTranslator Extends CTranslator
 		End
 		If expr.ctor t+="."+expr.ctor.munged+TransArgs( expr.args )
 		Return t
-
 	End
 
 	Method TransNewArrayExpr$( expr:NewArrayExpr )
@@ -327,22 +326,26 @@ Class BmxTranslator Extends CTranslator
 	'	If StringType( elemTy ) Return "bb_std_lang.stringArray"+Bra(texpr)
 		'		
 		Local t$="["+texpr+"]"
+		Local tmp$, i%=0
 		Local ma?=False
 		While ArrayType( elemTy )
 			elemTy=ArrayType( elemTy ).elemType
-			t+=",new "+TransType( elemTy )+"[0]"
+			tmp = t
+			If i = 0
+				t = "new " + TransType( elemTy ) + "[]"
+				t += tmp
+			Endif
+			i += 1
 			ma = True
 		Wend
 		' TEST THIS BIT LATER!!!!!!!!!!!!!!!!!!!!!!!!<!<!>!<!><!
 
 		If ma
-			Return "["+"new "+TransType( elemTy )+t+"]"
+			Return t
 		Else
 			Return "new "+TransType( elemTy )+t
-		End
-		
+		End		
 	End
-		
 
 	Method TransSelfExpr$( expr:SelfExpr )
 		Return "self"
