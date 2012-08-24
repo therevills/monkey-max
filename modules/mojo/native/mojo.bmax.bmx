@@ -318,13 +318,41 @@ Type gxtkGraphics
 		gs.setImage(img)
 		Return gs
 	EndMethod
-
 	
 	Method ReadPixels:Int( pixels:Int[], x:Int, y:Int, width:Int, height:Int, offset:Int, pitch:Int )
+		Local pix:TPixmap = GrabPixmap(x, y, width, height)
+		Local px:Int
+		Local py:Int
+		Local j:Int = offset
+		Local argb:Int
+		
+		For py = 0 Until height
+			For px = 0 Until width
+				pixels[j] = pix.ReadPixel(px, py)
+				j:+1
+			Next
+			j:+pitch - width
+		Next
+		
 		Return 0
 	EndMethod
 	
 	Method WritePixels2:Int( surface:gxtkSurface, pixels:Int[], x:Int, y:Int, width:Int, height:Int, offset:Int, pitch:Int )
+		Local pix:TPixmap = LockImage(surface.image)
+		Local px:Int
+		Local py:Int
+		Local j:Int = offset
+		Local argb:Int
+		
+		For py = 0 Until height
+			For px = 0 Until width
+				WritePixel(pix, px, py, pixels[j])
+				j:+1
+			Next
+			j:+pitch - width
+		Next
+		
+		UnlockImage(surface.image)
 		Return 0
 	EndMethod
 	
