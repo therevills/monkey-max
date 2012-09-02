@@ -21,14 +21,14 @@ for /f "tokens=1-3 delims=:." %%a in ("%time%") do (
 
 echo.
 echo Backing up old trans_winnt.exe (if its there) to trans_winnt.exe.bak_%yy%_%mo%_%dd%_%hh%_%mm%_%ss%
-ren "%OLDDIR%\trans\trans.build\stdcpp\trans_winnt.exe" trans_winnt.exe.bak_%yy%_%mo%_%dd%_%hh%_%mm%_%ss%
+ren "%OLDDIR%\trans\trans.build\stdcpp\trans_winnt.exe" "trans_winnt.exe.bak_%yy%_%mo%_%dd%_%hh%_%mm%_%ss%"
 echo.
 echo Renaming main_winnt.exe to trans_winnt.exe
-ren "%OLDDIR%\trans\trans.build\stdcpp\main_winnt.exe" trans_winnt.exe
+ren "%OLDDIR%\trans\trans.build\stdcpp\main_winnt.exe" "trans_winnt.exe"
 echo.
 echo Copying to the bin folder...
-ren "%OLDDIR%\..\bin\trans_winnt.exe" trans_winnt.exe.bak_%yy%_%mo%_%dd%_%hh%_%mm%_%ss%
-COPY "%OLDDIR%\trans\trans.build\stdcpp\trans_winnt.exe" %OLDDIR%\..\bin\"
+ren "%OLDDIR%\..\bin\trans_winnt.exe" "trans_winnt.exe.bak_%yy%_%mo%_%dd%_%hh%_%mm%_%ss%"
+COPY "%OLDDIR%\trans\trans.build\stdcpp\trans_winnt.exe" "%OLDDIR%\..\bin\"
 echo.
 echo.
 echo DONE!

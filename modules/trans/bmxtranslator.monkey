@@ -420,10 +420,16 @@ Class BmxTranslator Extends CTranslator
 		Local pri=ExprPri( expr )
 		Local t_lhs$=TransSubExpr( expr.lhs,pri )
 		Local t_rhs$=TransSubExpr( expr.rhs,pri-1 )
+		' looks like BlitMax's order of precedence is a bit different with the bit shifting, so we will wrap the rhs in brackets...
+		if expr.op = "shr" Or expr.op = "sar" Or expr.op = "shl"
+			t_rhs = Bra(t_rhs)
+		End
+		
 		Local t_expr$=t_lhs+TransBinaryOp( expr.op,t_rhs )+t_rhs
 		If expr.op="/" And IntType( expr.exprType ) t_expr=Bra( Bra(t_expr)+"|0" )
+		
 '		Return t_expr
-		If( expr.op="and" Or expr.op="or" )
+		If( expr.op="and" Or expr.op="or")
 			Return "(" + t_expr + ")"
 		Else
 			Return t_expr
