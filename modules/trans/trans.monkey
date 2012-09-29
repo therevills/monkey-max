@@ -4,6 +4,7 @@
 ' Placed into the public domain 24/02/2011.
 ' No warranty implied; use at your own risk.
 
+Import bmxtranslator
 Import astranslator
 Import cpptranslator
 Import cstranslator
@@ -18,4 +19,4 @@ Import os
 Import toker
 Import translator
 Import type
-Import bmxtranslator
+Import preprocessor

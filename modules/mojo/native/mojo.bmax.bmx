@@ -230,7 +230,8 @@ Type gxtkGraphics
 		If Upper(MOJO_IMAGE_FILTERING_ENABLED) = "TRUE" Then
 			flags = flags | FILTEREDIMAGE
 		EndIf
-		Local image:TImage = LoadImage("data/"+path, flags)
+		path = FixDataPath(path)
+		Local image:TImage = LoadImage(path, flags)
 		If image Then
 			Local gs:gxtkSurface = New gxtkSurface
 			gs.setImage(image)
@@ -526,6 +527,7 @@ Type gxtkAudio
 	Method PlayMusic:Int( path:String, flags:Int )
 		StopMusic()
 		channels[MUSIC_CHANNEL].channel = AllocChannel()
+		path = FixDataPath(path)
 		music = LoadSample( path )
 		If Not music Then Return -1
 		
@@ -633,11 +635,12 @@ Type gxtkAudio
 	Method LoadSample:gxtkSample( path:String )
 		Local extension:String = ExtractExt( path)
 		If extension = "ogg" Or extension = "wav" Then
-			Local sound:TSound = LoadSound("data/"+path)
+			path = FixDataPath(path)
+			Local sound:TSound = LoadSound(path)
 			If sound Then
 				Local gs:gxtkSample = New gxtkSample
 				gs.setSound(sound)
-				gs.path = "data/"+path
+				gs.path = path
 				Return gs
 			EndIf
 		Else

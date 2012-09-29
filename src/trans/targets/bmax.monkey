@@ -16,11 +16,69 @@ Class BmaxTarget Extends Target
 	
 	Method Config$()
 		Local config:=New StringStack
-		For Local kv:=Eachin Env
-			config.Push "CONST "+kv.Key+":String="+LangEnquote( kv.Value )
+		For Local kv:=Eachin _cfgVars
+			'config.Push "CONST "+kv.Key+":String="+Enquote( kv.Value,"bmx" )
+			config.Push "CONST "+kv.Key+":String="+LangEnquote( kv.Value)
 		Next
 		Return config.Join( "~n" )
 	End
+	
+Method LangEnquote$( str$ )
+	str=str.Replace( "\","\\" )
+	str=str.Replace( "~q","\~q" )
+	str=str.Replace( "~n","\n" )
+	str=str.Replace( "~r","\r" )
+	str=str.Replace( "~t","\t" )
+	For Local i=0 Until str.Length
+		If str[i]>=32 And str[i]<128 Continue
+		Local t$,n=str[i]
+		While n
+			Local c=(n&15)+48
+			If c>=58 c+=97-58
+			t=String.FromChar( c )+t
+			n=(n Shr 4) & $0fffffff
+		Wend
+		If Not t t="0"
+		Select ENV_LANG
+		Case "cpp"
+			t="~qL~q\x"+t+"~qL~q"
+		Default
+			t="\u"+("0000"+t)[-4..]
+		End
+		str=str[..i]+t+str[i+1..]
+		i+=t.Length-1
+	Next
+	Select ENV_LANG
+	Case "cpp"
+		str="L~q"+str+"~q"
+	Default
+		str="~q"+str+"~q"
+	End
+	Return str
+End
+
+Method BmxEnquote$( str$ )
+	str=str.Replace( "~~","~~~~" )
+	str=str.Replace( "~q","~~q" )
+	str=str.Replace( "~n","~~n" )
+	str=str.Replace( "~r","~~r" )
+	str=str.Replace( "~t","~~t" )
+	str=str.Replace( "~0","~~0" )
+	str="~q"+str+"~q"
+	Return str
+End
+
+Method BmxUnquote$( str$ )
+	str=str[1..str.Length-1]
+	str=str.Replace( "~~~~","~~z" )	'a bit dodgy - uses bad esc sequence ~z 
+	str=str.Replace( "~~q","~q" )
+	str=str.Replace( "~~n","~n" )
+	str=str.Replace( "~~r","~r" )
+	str=str.Replace( "~~t","~t" )
+	str=str.Replace( "~~0","~0" )
+	str=str.Replace( "~~z","~~" )
+	Return str
+End
 	
 	Method MakeTarget()
 	

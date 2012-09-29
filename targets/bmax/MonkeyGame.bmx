@@ -13,6 +13,14 @@ If Upper(BMAX_WINDOW_FULLSCREEN) = "TRUE"
 	_depth = 32
 EndIf
 
+Function FixDataPath$( path$ )
+	If path.ToLower().Contains("monkey://data/") Then 
+		path = "data/"+path[14..]
+	EndIf
+	Print "FDP = "+path
+	Return path
+EndFunction
+
 Graphics  BMAX_WINDOW_WIDTH.ToInt(), BMAX_WINDOW_HEIGHT.ToInt(), _depth
 
 bbInit()

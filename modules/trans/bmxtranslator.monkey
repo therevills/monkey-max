@@ -169,7 +169,7 @@ Class BmxTranslator Extends CTranslator
 			Endif
 			Return cdecl.munged
 		Endif
-		InternalErr
+		InternalErr("TransType")
 	End
 	
 	Method TransValue$( ty:Type,value$ )
@@ -216,7 +216,7 @@ Class BmxTranslator Extends CTranslator
 '			If ObjectType( ty ) Return "null"
 			If ObjectType( ty ) Return TransType( ty ) + "(null)"
 		Endif
-		InternalErr
+		InternalErr("TransValue")
 	End
 	
 	Method TransValDecl$( decl:ValDecl )
@@ -262,7 +262,7 @@ Class BmxTranslator Extends CTranslator
 		Else If ModuleDecl( decl.scope )
 			Return decl.munged
 		Endif
-		InternalErr
+		InternalErr("TransStatic")
 	End
 
 	Method TransTemplateCast$( ty:Type,src:Type,expr$ )
@@ -469,7 +469,7 @@ Class BmxTranslator Extends CTranslator
 			Return "bb_std_lang.slice("+expr.exprType+","+expr.from+","+expr.term+")"
 		Endif
 		Return t_expr+"["+t_args+"]"		
-		InternalErr
+		InternalErr("TransSliceExpr")
 	End
 
 
@@ -483,7 +483,7 @@ Class BmxTranslator Extends CTranslator
 		Else If StringType( expr.exprType )
 			Return "bb_std_lang.slice("+texpr+from+term+")"
 		Endif
-		InternalErr
+		InternalErr("TransSliceExpr")
 	End
 #End
 	Method TransSliceExpr$( expr:SliceExpr )
@@ -507,7 +507,7 @@ Class BmxTranslator Extends CTranslator
 		
 			Return "slice_string("+texpr+from+term+")"
 		Endif
-		InternalErr
+		InternalErr("TransSliceExpr")
 	End
 	
 	Method TransArrayExpr$( expr:ArrayExpr )
@@ -552,7 +552,7 @@ Class BmxTranslator Extends CTranslator
 			If ArrayType( ty ) Return "resize_array_array_"+ArrayType( ty ).elemType+Bra( texpr+","+arg0 )
 '			If ObjectType( ty ) Return "resize_object_array"+Bra( TransType(ty )+Bra (texpr)+","+arg0 )
 			If ObjectType( ty ) Return texpr+"[.."+arg0+"]"
-			InternalErr
+			InternalErr("TransIntrinsicExpr1")
 
 		'string methods
 		' Done all for BMax
@@ -569,6 +569,7 @@ Class BmxTranslator Extends CTranslator
 		Case "contains" Return texpr+".Contains"+Bra( arg0 )
 		Case "startswith" Return texpr+".StartsWith"+Bra( arg0 )
 		Case "endswith" Return texpr+".EndsWith"+Bra( arg0 )
+		Case "tochars" Return texpr+"ToCString()"
 
 		'string functions
 '		Case "fromchar" Return "String.fromCharCode"+Bra( arg0 )
@@ -601,7 +602,7 @@ Class BmxTranslator Extends CTranslator
 
 		End Select
 
-		InternalErr
+		InternalErr("TransIntrinsicExpr2")
 	End
 	
 	'***** Statements *****
@@ -755,7 +756,7 @@ Class BmxTranslator Extends CTranslator
 		Local func:=FuncDecl( block )
 		
 		If func 
-			If func.IsAbstract() InternalErr
+			If func.IsAbstract() InternalErr("EmitBlock")
 			If ENV_CONFIG<>"release" EmitEnter func.scope.ident+"."+func.ident
 		Endif
 
@@ -964,7 +965,7 @@ Class BmxTranslator Extends CTranslator
 		Case "~~" Return op
 		Case "not" Return op+" "
 		End Select
-		InternalErr
+		InternalErr("TransUnaryOp")
 	End
 	
 	Method TransAssignOp$( op$ )
@@ -1009,7 +1010,7 @@ Class BmxTranslator Extends CTranslator
 				Return " " + op + " "
 		End Select
 		
-		InternalErr
+		InternalErr("TransBinaryOp")
 	End
 	
 	Method TransIfStmt$( stmt:IfStmt )
@@ -1315,7 +1316,7 @@ Class BmxTranslator Extends CTranslator
 			munged="bb_"+id
 		Else
 			Print "OOPS1"
-			InternalErr
+			InternalErr("MungDecl")
 		Endif
 
 		''' Modify the "munged" variable:
@@ -1349,7 +1350,7 @@ Class BmxTranslator Extends CTranslator
 		Else
 			If scope="$"
 				Print "OOPS2"
-				InternalErr
+				InternalErr("MungDecl2")
 			Endif
 			set=New StringSet
 			mungedScopes.Set scope,set

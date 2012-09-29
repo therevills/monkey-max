@@ -238,7 +238,7 @@ Class CTranslator Extends Translator
 	
 	'Utility C/C++ style...
 	Method Enquote$( str$ )
-		Return LangEnquote( str )
+		Return .Enquote( str,ENV_LANG )
 	End
 
 	Method TransUnaryOp$( op$ )
