@@ -170,7 +170,7 @@ Function slice_string:String(arr:String, from:Int, term:Int = 2147483647)
 
 EndFunction
 
-Type ThrowableObject
+Type ThrowableObject Extends _Object
 	Method toString:String()
 		Return "Uncaught Monkey Exception"
 	EndMethod
