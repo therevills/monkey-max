@@ -144,7 +144,7 @@ Type gxtkApp
 	EndMethod
 	
 	Method LoadString:String( path:String )
-		path = "data/" + path
+		path = FixDataPath(path)
 		Try
 			Return LoadText( path )
 		Catch ReadFail:Object
