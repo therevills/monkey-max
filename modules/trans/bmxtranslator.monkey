@@ -598,7 +598,7 @@ Class BmxTranslator Extends CTranslator
 		' Done all for BMax
 		Case "floor","ceil","log","exp" Return id+Bra( arg0 )
 		Case "sqrt" Return "Sqr"+Bra(arg0)
-		Case "pow" Return Bra(arg0)+"^"+arg1
+		Case "pow" Return "(" + Bra(arg0) + "^" + Bra(arg1) + ")"
 
 		End Select
 
