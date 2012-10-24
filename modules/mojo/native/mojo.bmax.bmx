@@ -563,9 +563,7 @@ Type gxtkAudio
 		
 		If chan.state <> 0
 			chan.channel.Stop()
-			chan.channel=null
-			chan.sample=null
-			chan.state=0
+			chan.state = 0
 		EndIf
 	EndMethod
 	
