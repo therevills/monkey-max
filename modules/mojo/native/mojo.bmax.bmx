@@ -431,15 +431,15 @@ Type gxtkInput
 	EndMethod
 
 	Method JoyX:Int( index:Int )
-		Return Pub.FreeJoy.JoyX( index )
+		Return Pub.FreeJoy.JoyX(index Shr 4)
 	EndMethod
 
 	Method JoyY:Int( index:Int )
-		Return Pub.FreeJoy.JoyY( index )
+		Return Pub.FreeJoy.JoyY(index Shr 4)
 	EndMethod
 
 	Method JoyZ:Int( index:Int )
-		Return Pub.FreeJoy.JoyZ( index )
+		Return Pub.FreeJoy.JoyZ(index Shr 4)
 	EndMethod
 
 	Method TouchX:Float( index:Int )
