@@ -1,6 +1,6 @@
 set OLDDIR=%CD%
 
-%OLDDIR%\..\bin\trans_winnt.exe -build -config=release -target=stdcpp %OLDDIR%\trans\trans.monkey
+%OLDDIR%\..\bin\transcc_winnt.exe -build -config=release -target=C++_Tool %OLDDIR%\transcc\transcc.monkey
 @echo off
 if errorlevel 1 goto FAIL
 if errorlevel 0 goto CONTINUE
@@ -20,15 +20,15 @@ for /f "tokens=1-3 delims=:." %%a in ("%time%") do (
 )
 
 echo.
-echo Backing up old trans_winnt.exe (if its there) to trans_winnt.exe.bak_%yy%_%mo%_%dd%_%hh%_%mm%_%ss%
-ren "%OLDDIR%\trans\trans.build\stdcpp\trans_winnt.exe" "trans_winnt.exe.bak_%yy%_%mo%_%dd%_%hh%_%mm%_%ss%"
+echo Backing up old transcc_winnt.exe (if its there) to transcc_winnt.exe.bak_%yy%_%mo%_%dd%_%hh%_%mm%_%ss%
+ren "%OLDDIR%\transcc\transcc.build\cpptool\transcc_winnt.exe" "transcc_winnt.exe.bak_%yy%_%mo%_%dd%_%hh%_%mm%_%ss%"
 echo.
-echo Renaming main_winnt.exe to trans_winnt.exe
-ren "%OLDDIR%\trans\trans.build\stdcpp\main_winnt.exe" "trans_winnt.exe"
+echo Renaming main_winnt.exe to transcc_winnt.exe
+ren "%OLDDIR%\transcc\transcc.build\cpptool\main_winnt.exe" "transcc_winnt.exe"
 echo.
 echo Copying to the bin folder...
-ren "%OLDDIR%\..\bin\trans_winnt.exe" "trans_winnt.exe.bak_%yy%_%mo%_%dd%_%hh%_%mm%_%ss%"
-COPY "%OLDDIR%\trans\trans.build\stdcpp\trans_winnt.exe" "%OLDDIR%\..\bin\"
+ren "%OLDDIR%\..\bin\transcc_winnt.exe" "transcc_winnt.exe.bak_%yy%_%mo%_%dd%_%hh%_%mm%_%ss%"
+COPY "%OLDDIR%\transcc\transcc.build\cpptool\transcc_winnt.exe" "%OLDDIR%\..\bin\"
 echo.
 echo.
 echo DONE!
