@@ -52,7 +52,7 @@ Type BBFileStream Extends BBStream
 		Try
 			_stream.seek( Position)
 			_position=_stream.Pos()
-		Catch( ex )
+		Catch ex:Object
 		EndTry
 		Return _position
 	End Method
@@ -64,7 +64,7 @@ Type BBFileStream Extends BBStream
 			Local:Int n=_stream.read( buffer._data,offset,Count )
 			_position:+n
 			Return n
-		Catch( ex:Object )
+		Catch ex:Object
 		EndTry
 		Return 0
 	End Method
@@ -77,7 +77,7 @@ Type BBFileStream Extends BBStream
 			_position+=Count;
 			If( _position>_length ) _length=_position;
 			Return Count;
-		Catch( ex:Object )
+		Catch ex:Object
 		EndTry
 		Return 0
 	End Method
