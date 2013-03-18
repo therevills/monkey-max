@@ -4,14 +4,15 @@
 '
 'Can be overriden via transcc cmd line
 '
-MODPATH="${MONKEYDIR}/modules"
+MODPATH="${MONKEYDIR}/modules;H:\Dropbox\CodeMonkey\diddyhg\src;D:\Users\revills\Dropbox\CodeMonkey\diddyhg\src"
+
 '--------------------
 
 '--------------------
 ' BlitzMax path
 '
-'BMAX_PATH="E:\Dropbox\Dropbox\CodeMax\BlitzMax\1.44b\bin\bmk.exe"
-BMAX_PATH="C:\BlitzMax145\bin\bmk.exe"
+BMAX_PATH="E:\Dropbox\Dropbox\CodeMax\BlitzMax\1.44b\bin\bmk.exe"
+BMAX_PATH="H:\Dropbox\CodeMax\BlitzMax\1.48\bin\bmk.exe"
 '--------------------
 
 '--------------------
@@ -49,6 +50,7 @@ ANT_PATH="${SYSTEMDRIVE}\ant"
 MINGW_PATH="${SYSTEMDRIVE}\monkey_sdks\MinGW"
 MINGW_PATH="${SYSTEMDRIVE}\MinGW32"
 MINGW_PATH="${SYSTEMDRIVE}\MinGW"
+MINGW_PATH="H:\Tools\MinGW32"
 '--------------------
 
 '--------------------

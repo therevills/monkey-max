@@ -148,13 +148,12 @@ Type BBGame
 	End Method
 	
 	Method LoadString:String( path:String )
-
-		Local stream:TStream = OpenInputStream( path )
-		If stream=Null Return ""
-		Local text:String = stream.ReadString(stream.size())
-		stream.close()
-
-		return text
+		path = PathToFilePath(path)
+		Try
+			Return LoadText( path )
+		Catch ReadFail:Object
+			Return Null
+		EndTry
 	End Method
 	
 	Method PollJoystick:Int( port:Int,JoyX:Float[],JoyY:Float[],JoyZ:Float[],buttons:Int[] )
