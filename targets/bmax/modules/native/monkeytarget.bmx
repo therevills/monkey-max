@@ -17,7 +17,7 @@ Type BBMonkeyGame Extends BBBMaxGame
 			bbInit()
 			bbMain()
 			
-		Catch ex:String
+		Catch ex:Object
 			game.Die(ex)
 			End
 			

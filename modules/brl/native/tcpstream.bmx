@@ -22,7 +22,7 @@ Type BBTcpStream Extends BBStream
 				return true
 			EndIf
 			
-		Catch ex:String
+		Catch ex:Object
 		EndTry
 		
 		_state=1
@@ -33,7 +33,7 @@ Type BBTcpStream Extends BBStream
 	Method ReadAvail:Int()
 		Try
 			Return _sock.ReadAvail()
-		Catch  ex:String
+		Catch ex:Object
 		EndTry
 		_state=-1
 		return 0
@@ -58,7 +58,7 @@ Type BBTcpStream Extends BBStream
 		Try
 			_sock.close()
 			if( _state=1 ) _state=2
-		Catch( ex:String )
+		Catch ex:Object
 			_state=-1
 		EndTry
 		_sock=null
@@ -72,7 +72,7 @@ Type BBTcpStream Extends BBStream
 			Local n:Int=_input.read( buffer._data,offset,Count )
 			If n>=0 Return n
 			_state=2
-		Catch ex:String
+		Catch ex:Object
 			_state=-1
 		EndTry
 		return 0
@@ -85,7 +85,7 @@ Type BBTcpStream Extends BBStream
 		try
 			_output.write( buffer._data,offset,Count )
 			return count
-		Catch ex:String
+		Catch ex:Object
 			_state=-1
 		EndTry
 		return 0

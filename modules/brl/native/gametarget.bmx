@@ -180,35 +180,33 @@ Type BBGame
 			Select mode
 				Case "r","rb"
 					'read only, must exist
-					If FileType(path) <> FILETYPE_FILE Return Null
-					stream = ReadStream(path)
+					stream = .ReadFile(path)
 					
 				Case "w","wb"
 					'write an empty file
-					If FileType(path) = FILETYPE_FILE DeleteFile(path)
-					stream = WriteStream(path)
+					stream = .WriteFile(path)
 					
 				Case "a","ab"
 					'append
-					stream = WriteStream(path)
+					stream = .OpenFile(path)
 					stream.seek(stream.size()-1)
 					
 				Case "r+","rb+"
 					'read only, must exist
-					If FileType(path) <> FILETYPE_FILE Return Null
-					stream = WriteFile(path)
+					stream = .OpenFile(path)
 					
 				Case "w+","wb+"
 					'write an empty file
-					If FileType(path) = FILETYPE_FILE DeleteFile(path)
-					stream = WriteStream(path)
+					stream = .WriteFile(path)
 					
 				Case "a+","ab+"
 					'append
-					stream = WriteStream(path)
+					stream = .OpenFile(path)
 					stream.seek(stream.size()-1)
 			End Select
-		Catch ex:String
+			Return stream
+			
+		Catch ex:Object
 		EndTry
 		
 		return null
@@ -263,7 +261,7 @@ Type BBGame
 		
 		Try
 			_delegate.StartGame()
-		Catch ex:String
+		Catch ex:Object
 			If Die( ex ) Throw ""
 		EndTry
 	End Method
@@ -275,7 +273,7 @@ Type BBGame
 		
 		Try
 			_delegate.SuspendGame()
-		Catch ex:String
+		Catch ex:Object
 			If Die( ex ) Throw ""
 		EndTry
 	End Method
@@ -287,7 +285,7 @@ Type BBGame
 		
 		Try
 			_delegate.ResumeGame()
-		Catch ex:String
+		Catch ex:Object
 			If Die( ex ) Throw ""
 		EndTry
 	End Method
@@ -298,7 +296,7 @@ Type BBGame
 		
 		Try
 			_delegate.UpdateGame()
-		Catch ex:String
+		Catch ex:Object
 			If Die( ex ) Throw ""
 		EndTry
 	End Method
@@ -309,7 +307,7 @@ Type BBGame
 		
 		Try
 			_delegate.RenderGame()
-		Catch ex:String
+		Catch ex:Object
 			If Die( ex ) Throw ""
 		EndTry
 	End Method
@@ -320,7 +318,7 @@ Type BBGame
 		
 		Try
 			_delegate.KeyEvent(ev,data)
-		Catch ex:String
+		Catch ex:Object
 			If Die( ex ) Throw ""
 		EndTry
 	End Method
@@ -331,7 +329,7 @@ Type BBGame
 		
 		Try
 			_delegate.MouseEvent(ev,data,X,Y)
-		Catch ex:String
+		Catch ex:Object
 			If Die( ex ) Throw ""
 		EndTry
 	End Method
@@ -342,7 +340,7 @@ Type BBGame
 		
 		Try
 			_delegate.TouchEvent(ev,data,X,Y)
-		Catch ex:String
+		Catch ex:Object
 			If Die( ex ) Throw ""
 		EndTry
 	End Method
@@ -353,7 +351,7 @@ Type BBGame
 		
 		Try
 			_delegate.MotionEvent(ev,data,X,Y,Z)
-		Catch ex:String
+		Catch ex:Object
 			If Die( ex ) Throw ""
 		EndTry
 	End Method
