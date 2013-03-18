@@ -1,3 +1,4 @@
+' ***** Start diddy.bmax.bmx ******
 Global diddy_mouseWheel:Float = 0.0
 
 Type diddy
@@ -138,3 +139,6 @@ EndFunction
 Function BlitzMaxHideMouse()
 	HideMouse()
 EndFunction
+' ***** End diddy.bmax.bmx ******
+
+

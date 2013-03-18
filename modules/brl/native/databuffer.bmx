@@ -1,4 +1,4 @@
-
+' ***** Start databuffer.bmx ******
 Type BBDataBuffer
 	Field _data:Int;
 	Field _length:Int;
@@ -39,3 +39,6 @@ Type BBDataBuffer
 	EndMethod
 
 EndType
+' ***** End databuffer.bmx ******
+
+

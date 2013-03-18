@@ -251,12 +251,11 @@ Class BmxTranslator Extends CTranslator
 	End
 
 	'***** Declarations *****
-
-	Method TransStatic$( decl:Decl )
-		If decl.IsExtern()
+	Method TransStatic:String(decl:Decl)
+		If decl.IsExtern() And ModuleDecl( decl.scope )
 			Return decl.munged
-		Else If _env And decl.scope And decl.scope=_env.ClassScope
-			Return decl.munged
+		Else If _env And decl.scope And decl.scope=_env.ClassScope()
+			Return decl.scope.munged+"."+decl.munged
 		Else If ClassDecl( decl.scope )
 			Return decl.scope.munged+"."+decl.munged
 		Else If ModuleDecl( decl.scope )
@@ -297,8 +296,8 @@ Class BmxTranslator Extends CTranslator
 		Return TransStatic( decl )+TransArgs( args )
 	End
 	
-	Method TransSuperFunc$( decl:FuncDecl,args:Expr[] )
-		Return "super."+decl.munged+TransArgs( args )
+	Method TransSuperFunc:String(decl:FuncDecl, args:Expr[])
+		Return "super." + decl.munged + TransArgs(args)
 	End
 	
 	'***** Expressions *****
@@ -573,7 +572,8 @@ Class BmxTranslator Extends CTranslator
 
 		'string functions
 '		Case "fromchar" Return "String.fromCharCode"+Bra( arg0 )
-		Case "fromchar" Return "Chr"+Bra( arg0 )
+		Case "fromchar" Return "Chr" + Bra(arg0)
+		Case "fromchars" Return "string_from_chars" + Bra(arg0)
 
 		' ** TO-DO **
 		' BlitzMax angle stuff isnt proper, need to minus 90 I think from the angle!
@@ -1327,7 +1327,7 @@ Class BmxTranslator Extends CTranslator
 			Local c:Int = munged[i]
 			If c = "_1" Then
 				newmunged += "_1" + "_1"
-			Elseif c>=65 And c<=90 Then
+			ElseIf c >= 65 And c <= 90 Then
 				newmunged += "_1" + String.FromChar(c)
 			Else
 				newmunged += String.FromChar(c)
