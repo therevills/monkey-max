@@ -76,17 +76,22 @@ Class BMaxBuilder Extends Builder
 		SaveString main, "MonkeyGame.bmx"
 
 		If tcc.opt_build
-			If tcc.opt_config = "DEBUG"
-				Execute tcc.BMAX_PATH + " makeapp -d MonkeyGame.bmx"
+			If tcc.opt_config = "debug"
+				Execute tcc.BMAX_PATH + " makeapp -d -o MonkeyGame.debug MonkeyGame.bmx"
+				
+				'execute debug app
+				If tcc.opt_run
+					Execute "MonkeyGame.debug.exe", False
+				Endif
 			Else
-				Execute tcc.BMAX_PATH + " makeapp -a -r -v -t gui MonkeyGame.bmx"
+				Execute tcc.BMAX_PATH + " makeapp -a -r -v -t gui -o MonkeyGame MonkeyGame.bmx"
+				
+				'execute release app
+				If tcc.opt_run
+					Execute "MonkeyGame.exe", False
+				Endif
 			EndIf
-			
-			If tcc.opt_run
-				Execute "MonkeyGame.exe", False
-			Endif
-
-		Endif
+		EndIf
 		
 	End
 	
