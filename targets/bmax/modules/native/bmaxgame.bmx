@@ -13,6 +13,7 @@ Type BBBMaxGame Extends BBGame
 	
 	Field startMillis:Float=0
 	
+	Field joyButtonStates:Int[32]
 	Field keyStates:Int[512]
 	Field mouseLastX:Float
 	Field mouseLastY:Float
@@ -125,6 +126,7 @@ Type BBBMaxGame Extends BBGame
 		printError(o)
 	EndMethod
 	
+	'input
 	Method PollInput()
 		' --- this is a helper to poll inputs and send it to monkey ---
 		'seems a shame to have so many copies in memory of input states ... but meh
@@ -178,6 +180,35 @@ Type BBBMaxGame Extends BBGame
 				EndIf				
 			EndIf
 		Next
+	End Method
+	
+	Method PollJoystick:Int( port:Int,JoyX:Float[],JoyY:Float[],JoyZ:Float[],buttons:Int[] )
+		'oppertunity to update teh joystick from blitzmax please
+		
+		'check if this joystick exists
+		If port >= JoyCount() Return False
+		
+		'axis
+		JoyX[0] = pub.FreeJoy.JoyX(port)
+		JoyY[0] = pub.FreeJoy.JoyY(port)
+		JoyZ[0] = pub.FreeJoy.JoyZ(port)
+		
+		'buttons
+		For Local index:Int = 0 Until buttons.Length
+			If joyButtonStates[index] = False
+				If JoyHit(index,port)
+					joyButtonStates[index] = True
+				EndIf
+			Else
+				If JoyDown(index,port) = False
+					joyButtonStates[index] = False
+				EndIf
+			EndIf
+			buttons[index] = joyButtonStates[index]
+		Next
+		
+		'there was a joystick!
+		Return True
 	End Method
 	
 	'resource loading
