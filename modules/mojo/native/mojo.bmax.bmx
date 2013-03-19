@@ -275,18 +275,34 @@ Type gxtkAudio
 		channels[MUSIC_CHANNEL].channel = AllocChannel()
 		path = BBBMaxGame.BMaxGame().PathToFilePath(path)
 		
-		'load the music as a sample, really?
-		Local musicSound:TSound = BBBMaxGame.BMaxGame().LoadSample( path,flags )
-		If Not musicSound Then Return -1
-		
-		'create a monkey sample object
-		music = New gxtkSample
-		music.sound = musicSound
-		music.path = path
-		music.Loop = flags
-		
-		'play the sample on teh music channel
-		PlaySample(music, MUSIC_CHANNEL, flags)
+		Local sound:TSound
+		If flags = 1
+			'looping
+			'load sound with looping
+			sound = BBBMaxGame.BMaxGame().LoadSample( path,1 )
+			If Not sound Then Return -1
+			
+			'create a monkey sample object
+			music = New gxtkSample
+			music.path = path
+			music.soundLooping = sound
+			
+			'play on music channel (with looping)
+			PlaySample(music, MUSIC_CHANNEL, 1)
+		Else
+			'not looping
+			'load sound without looping
+			sound = BBBMaxGame.BMaxGame().LoadSample( path,0 )
+			If Not sound Then Return -1
+			
+			'create a monkey sample object
+			music = New gxtkSample
+			music.path = path
+			music.sound = sound
+			
+			'play on music channel (non looping)
+			PlaySample(music, MUSIC_CHANNEL, 0)
+		EndIf
 		Return 0
 	EndMethod
 	
@@ -318,7 +334,8 @@ Type gxtkAudio
 		
 		If chan.state <> 0
 			chan.channel.Stop()
-			chan.state = 0
+			chan.State = 0
+			chan.sample = Null
 		EndIf
 	EndMethod
 	
@@ -337,20 +354,34 @@ Type gxtkAudio
 	Method PlaySample( sample:gxtkSample, channel:Int, flags:Int )
 		'get and modify channel
 		Local chan:gxtkChannel = channels[channel]
-		If chan.state <> 0 Then chan.channel.SetPaused(True)
-		chan.sample = sample
-		chan.loops = (flags = 1)
-		chan.state = 1
 		
-		'if looping, we need to reload the sound with the looping flag
-		If chan.loops And sample.Loop = False
-			'inject new sound into this sample
-			sample.sound = BBBMaxGame.BMaxGame().LoadSample(sample.path,flags)
-			sample.Loop = flags
+		'pause channel if it is already playing
+		If chan.State <> 0 Then chan.channel.SetPaused(True)
+		
+		'update other runtime bits in channel
+		chan.loops = (flags = 1)
+		chan.State = 1
+		
+		'check what action to take
+		If chan.loops
+			'check if we need to load looping version
+			If sample.soundLooping = Null sample.soundLooping = BBBMaxGame.BMaxGame().LoadSample(sample.path,1)
+			
+			'set which sample is playing in channel
+			chan.sample = sample
+			
+			'play the sound
+			PlaySound( sample.soundLooping, chan.channel )
+		Else
+			'check if we need to load non looping version
+			If sample.sound = Null sample.sound = BBBMaxGame.BMaxGame().LoadSample(sample.path,0)
+			
+			'set which sample is playing in channel
+			chan.sample = sample
+			
+			'play the sound
+			PlaySound( sample.sound, chan.channel )
 		EndIf
-	
-		'play the sound
-		PlaySound( sample.sound, chan.channel )
 	EndMethod
 
 	Method SetPan( channel:Int, pan:Float )
@@ -395,8 +426,16 @@ Type gxtkAudio
 		'create monkey sample
 		Local sample:gxtkSample = New gxtkSample
 		sample.path = path
-		sample.sound = sound
-		sample.Loop = flags
+		
+		'choose where to store this loaded sound
+		If flags = 1
+			'is a looping sound
+			sample.soundLooping = sound
+		Else
+			'is not looping (really no other way to switch a sample to loop/non-loop????)
+			sample.sound = sound
+		EndIf
+		
 		Return sample
 	EndMethod
 EndType
@@ -414,8 +453,8 @@ EndType
 
 Type gxtkSample
 	Field sound:TSound
+	Field soundLooping:TSound
 	Field path:String
-	Field loop:Int
 	
 	Method Discard()
 		Self.sound = null
