@@ -140,7 +140,7 @@ Type BBGame
 	End Method
 	
 	Method SaveState:Int(  State:String )
-		return -1
+		Return -1
 	End Method
 	
 	Method LoadState:String()
@@ -148,11 +148,14 @@ Type BBGame
 	End Method
 	
 	Method LoadString:String( path:String )
-		path = PathToFilePath(path)
 		Try
-			Return LoadText( path )
+			Local stream:TStream = OpenInputStream( path )
+			If stream=Null Return ""
+			Local text:String = stream.ReadString(stream.size())
+			stream.close()
+			Return text
 		Catch ReadFail:Object
-			Return Null
+			Return ""
 		EndTry
 	End Method
 	
