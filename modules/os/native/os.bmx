@@ -1,3 +1,4 @@
+' ***** Start os.bmx ******
 Function BmaxEnd(ret:Int)
 	End
 EndFunction
@@ -47,3 +48,6 @@ Function BmaxHostOS:String()
 	Return "linux"
 ?
 EndFunction
+' ***** End os.bmx ******
+
+
