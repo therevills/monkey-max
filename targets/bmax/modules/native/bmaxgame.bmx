@@ -215,6 +215,7 @@ Type BBBMaxGame Extends BBGame
 	Method LoadBitmap:TImage(path:String)
 		Local flags:Int = MASKEDIMAGE
 		If Int(CFG_MOJO_IMAGE_FILTERING_ENABLED) flags = flags | FILTEREDIMAGE
+		If Int(CFG_BMAX_IMAGE_MIPMAPPED_ENABLED) flags = flags | MIPMAPPEDIMAGE
 		Return LoadImage(path,flags)
 	End Method
 	
