@@ -11,9 +11,11 @@ Const KLUDGE_INTERFACES:=True
 'To be used after reflection/semant immediately before translate
 '
 Function KludgeInterfaces( app:AppDecl )
-
+	'skn3: so in kludge interface we build a SUPER "_Object" that contains all interface methods
+	'each user Class in monkey extends from this super "_Object" so we need to make sure that
+	'overriding methods correctly determin if they need to be munged... i think?
+	
 	'find Object decl
-	'
 	Local odecl:ClassDecl
 	For Local decl:=Eachin app.allSemantedDecls
 		Local cdecl:=ClassDecl( decl )
@@ -84,11 +86,11 @@ Function KludgeInterfaces( app:AppDecl )
 					fdecl.scope=Null
 					idecl.InsertDecl fdecl
 					fdecl.attrs&=~DECL_ABSTRACT
-					If Not VoidType( fdecl.retType )
+					If Not VoidType(fdecl.retType)
 						Local expr:=New ConstExpr
 						expr.exprType=fdecl.retType
-						fdecl.AddStmt New ReturnStmt( expr )
-					Endif
+						fdecl.AddStmt New ReturnStmt(expr)
+					EndIf
 					'
 				Endif
 			Next
@@ -132,22 +134,32 @@ Function KludgeInterfaces( app:AppDecl )
 			For Local decl:=Eachin cdecl.Semanted
 				Local fdecl:=FuncDecl( decl )
 				If fdecl And fdecl.IsMethod() And Not fdecl.overrides
-					Local list:=imethods.Get( fdecl.ident )
+					Local list:= imethods.Get(fdecl.ident)
 					If list
 						For Local fdecl2:=Eachin list
-							If fdecl.EqualsFunc( fdecl2 )
-								fdecl.overrides=fdecl2
+							If fdecl.EqualsFunc(fdecl2)
+								fdecl.overrides = fdecl2
 								Exit
 							Endif
 						Next
-					Endif
+						
+						'if none found then we need to search again for matching name?
+						'is this ok, seems to work?
+						If Not fdecl.overrides
+							For Local fdecl2:= EachIn list
+								If fdecl.ident = fdecl2.ident and fdecl.EqualsArgs(fdecl2)
+									fdecl.overrides = fdecl2
+									Exit
+								Endif
+							Next
+						EndIf
+					EndIf
 				Endif
 			Next
 		Endif
 	Next
 	
 	app.mainModule.InsertDecl idecl
-
 	app.Semanted.AddFirst idecl
 	app.allSemantedDecls.AddFirst idecl
 	
