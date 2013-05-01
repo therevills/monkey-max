@@ -1,14 +1,14 @@
 ' ***** Start lang.bmx ******
-Global D2R:Float=0.017453292519943295;
-Global R2D:Float=57.29577951308232;
+Global D2R:Float=0.017453292519943295
+Global R2D:Float=57.29577951308232
 
 Function pushErr()
-	_errStack.AddLast( _errInfo );
+	_errStack.AddLast( _errInfo )
 EndFunction
 
 Function popErr()
 	_errInfo=String(_errStack.ValueAtIndex(_errStack.Count()-1))
-	_errStack.RemoveLast();
+	_errStack.RemoveLast()
 EndFunction
 
 Function stackTrace:String()
@@ -25,13 +25,13 @@ Function printError(err:Object)
 	If TBlitzException(err) Then
 		Local output:String = TBlitzException(err).ToString()
 		Notify(output)
-		Print( "Monkey Runtime Error : "+output );
-		Print( "" );
-		Print( stackTrace() );
+		Print( "Monkey Runtime Error : "+output )
+		Print( "" )
+		Print( stackTrace() )
 	Else
 		Notify (err.ToString())
-		Print( "" );
-		Print( stackTrace() );
+		Print( "" )
+		Print( stackTrace() )
 	EndIf
 EndFunction
 
@@ -39,7 +39,7 @@ Function error( err:String )
 	If err = "" Then
 		End
 	Else
-		RuntimeError err;
+		RuntimeError err
 	EndIf
 EndFunction
 
@@ -48,101 +48,102 @@ Function DebugLog:Int( str:String )
 	Return 0
 EndFunction
 
-Function DebugStop:Int()
-	error("STOP")
-	Return 0
-EndFunction
+'erm why is this needed surely it would work fine ?????
+'Function DebugStop:Int()
+'	error("STOP")
+'	Return 0
+'EndFunction
 
 Function resize_string_array:String[]( arr:String[], leng:Int )
-	Local i:Int = arr.length;
-	arr = arr[0..leng];
-	If( leng<=i ) Return arr;
+	Local i:Int = arr.length
+	arr = arr[0..leng]
+	If( leng<=i ) Return arr
 	While( i<leng )
-		arr[i]="";
+		arr[i]=""
 		i:+1
 	Wend
-	Return arr;
+	Return arr
 EndFunction
 
 Function resize_float_array:Float[]( arr:Float[], leng:Int )
-	Local i:Int = arr.length;
-	arr = arr[0..leng];
-	If( leng<=i ) Return arr;
+	Local i:Int = arr.length
+	arr = arr[0..leng]
+	If( leng<=i ) Return arr
 	While( i<leng )
-		arr[i]=0;
+		arr[i]=0
 		i:+1
 	Wend
-	Return arr;
+	Return arr
 EndFunction
 
 Function resize_int_array:Int[]( arr:Int[], leng:Int )
-	Local i:Int = arr.length;
-	arr = arr[0..leng];
-	If( leng<=i ) Return arr;
+	Local i:Int = arr.length
+	arr = arr[0..leng]
+	If( leng<=i ) Return arr
 	While( i<leng )
-		arr[i]=0;
+		arr[i]=0
 		i:+1
 	Wend
-	Return arr;
+	Return arr
 EndFunction
 
 Function resize_object_array:Object[]( arr:_Object[],leng:Int )
-	Local i:Int=arr.length;
-	arr=arr[0..leng];
-	If( leng<=i ) Return arr;
+	Local i:Int=arr.length
+	arr=arr[0..leng]
+	If( leng<=i ) Return arr
 	While( i<leng )
-		arr[i]=Null;
+		arr[i]=Null
 		i:+1
 	Wend
-	Return arr;
+	Return arr
 EndFunction
 
 Function resize_array_array_Int:Int[][]( arr:Int[][], leng:Int )
-	Local i:Int = arr.length;
-	arr = arr[..leng];
-	If( leng<=i ) Return arr;
+	Local i:Int = arr.length
+	arr = arr[..leng]
+	If( leng<=i ) Return arr
 
 	For Local l:Int = 0 Until Len(arr)
 		arr[l] = arr[l][..leng]
 	Next
 
 	While( i<leng )
-		arr[0][i]=0;
+		arr[0][i]=0
 		i:+1
 	Wend
-	Return arr;
+	Return arr
 EndFunction
 
 Function resize_array_array_Float:Float[][]( arr:Float[][], leng:Int )
-	Local i:Int = arr.length;
-	arr = arr[..leng];
-	If( leng<=i ) Return arr;
+	Local i:Int = arr.length
+	arr = arr[..leng]
+	If( leng<=i ) Return arr
 
 	For Local l:Int = 0 Until Len(arr)
 		arr[l] = arr[l][..leng]
 	Next
 
 	While( i<leng )
-		arr[0][i]=0;
+		arr[0][i]=0
 		i:+1
 	Wend
-	Return arr;
+	Return arr
 EndFunction
 
 Function resize_array_array_String:String[][]( arr:String[][], leng:Int )
-	Local i:Int = arr.length;
-	arr = arr[..leng];
-	If( leng<=i ) Return arr;
+	Local i:Int = arr.length
+	arr = arr[..leng]
+	If( leng<=i ) Return arr
 
 	For Local l:Int = 0 Until Len(arr)
 		arr[l] = arr[l][..leng]
 	Next
 	
 	While( i<leng )
-		arr[0][i]="";
+		arr[0][i]=""
 		i:+1
 	Wend
-	Return arr;
+	Return arr
 EndFunction
 
 ' From the BMax help: "If EndIndex is omitted, it defaults to the length of the string"
@@ -170,12 +171,24 @@ Function slice_string:String(arr:String, from:Int, term:Int = 2147483647)
 
 EndFunction
 
+Function string_from_chars:String(chars:Int[])
+	' --- this will replicate monkeys FromChars string function ---
+	'seems like it would be the fastest option to build a short array and then convert it in 1 call
+	'build temp short array
+	Local converted:Short[chars.length]
+	For Local index:Int = 0 Until chars.length
+		converted[index] = Short(chars[index])
+	Next
+	
+	'convert and return short array
+	Return String.FromShorts(converted, converted.length)
+End Function
+
 Type ThrowableObject Extends _Object
 	Method toString:String()
 		Return "Uncaught Monkey Exception"
 	EndMethod
 EndType
-
 ' ***** End lang.bmx ******
 
 

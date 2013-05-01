@@ -1,8 +1,19 @@
+
+'--------------------
+'Monkey modules path
+'
+'Can be overriden via transcc cmd line
+'
+MODPATH="${MONKEYDIR}/modules;H:\Dropbox\CodeMonkey\diddyhg\src;D:\Users\revills\Dropbox\CodeMonkey\diddyhg\src"
+
+'--------------------
+
 '--------------------
 ' BlitzMax path
 '
 BMAX_PATH="E:\Dropbox\Dropbox\CodeMax\BlitzMax\1.44b\bin\bmk.exe"
-BMAX_PATH="D:\Users\revills\Dropbox\CodeMax\BlitzMax\1.44b\bin\bmk.exe"
+BMAX_PATH="H:\Dropbox\CodeMax\BlitzMax\1.48\bin\bmk.exe"
+'--------------------
 
 '--------------------
 'HTML player path.
@@ -22,10 +33,10 @@ HTML_PLAYER="${TRANSDIR}\mserver_winnt.exe"
 'Ant is currently available here: 
 '	http://ant.apache.org/bindownload.cgi
 '
+ANT_PATH="${SYSTEMDRIVE}\monkey_sdks\apache-ant-1.8.4"
+ANT_PATH="${SYSTEMDRIVE}\apache-ant-1.8.4"
 ANT_PATH="${SYSTEMDRIVE}\apache-ant-1.8.2"
 ANT_PATH="${SYSTEMDRIVE}\ant"
-ANT_PATH="E:\Programming\apache-ant-1.8.2"
-
 '--------------------
 
 '--------------------
@@ -36,8 +47,10 @@ ANT_PATH="E:\Programming\apache-ant-1.8.2"
 'MinGW is currently available here:
 '	http://tdm-gcc.tdragon.net/download
 '
+MINGW_PATH="${SYSTEMDRIVE}\monkey_sdks\MinGW"
 MINGW_PATH="${SYSTEMDRIVE}\MinGW32"
 MINGW_PATH="${SYSTEMDRIVE}\MinGW"
+MINGW_PATH="H:\Tools\MinGW32"
 '--------------------
 
 '--------------------
@@ -54,8 +67,6 @@ JDK_PATH="${PROGRAMFILES}\Java\jdk1.7.0_02"
 JDK_PATH="${PROGRAMFILES}\Java\jdk1.6.0_23"
 JDK_PATH="${PROGRAMFILES}\Java\jdk1.6.0_21"
 JDK_PATH="${PROGRAMFILES}\Java\jdk1.6.0_19"
-JDK_PATH="C:\Program Files\Java\jdk1.6.0_24"
-
 '--------------------
 
 '--------------------
@@ -63,12 +74,8 @@ JDK_PATH="C:\Program Files\Java\jdk1.6.0_24"
 '
 'Must be set to a valid for for ANDROID target support
 '
-'The Android SDK is currently available here:
-'	http://developer.android.com/sdk/index.html
-'
+ANDROID_PATH="${SYSTEMDRIVE}\monkey_sdks\android-sdk-windows"
 ANDROID_PATH="${SYSTEMDRIVE}\android-sdk-windows"
-ANDROID_PATH="C:\Program Files (x86)\Android\android-sdk"
-
 '--------------------
 
 '--------------------
@@ -78,10 +85,7 @@ ANDROID_PATH="C:\Program Files (x86)\Android\android-sdk"
 '
 'Either HTML_PLAYER or FLASH_PLAYER must be set for FLASH target support.
 '
-'The Flex SDK is currently available here:
-'	http://opensource.adobe.com/wiki/display/flexsdk/Flex+SDK
-'
-FLEX_PATH="E:\Programming\flex_sdk_4.1"
+FLEX_PATH="${SYSTEMDRIVE}\monkey_sdks\flex_sdk_4.6"
 FLEX_PATH="${SYSTEMDRIVE}\flex_sdk_4.6"
 FLEX_PATH="${SYSTEMDRIVE}\flex_sdk_4.5"
 FLEX_PATH="${SYSTEMDRIVE}\flex_sdk_4.1.0.16076"
@@ -90,11 +94,9 @@ FLEX_PATH="${SYSTEMDRIVE}\flex_sdk_4.0.0.14159"
 FLEX_PATH="${SYSTEMDRIVE}\flex_sdk_4.0"
 FLEX_PATH="${SYSTEMDRIVE}\flex_sdk_4"
 FLEX_PATH="${SYSTEMDRIVE}\flex_sdk"
-
 '
 'for opening .swf files...monkey will use HTML_PLAYER if this is not set.
-'FLASH_PLAYER="${SYSTEMDRIVE}\flex_sdk_4.0\flashplayer_10_sa_debug.exe"
-'
+'FLASH_PLAYER="...?..."
 '--------------------
 
 '--------------------
@@ -102,21 +104,13 @@ FLEX_PATH="${SYSTEMDRIVE}\flex_sdk"
 '
 'PSM_PATH must be set for PSM target support.
 '
-'Note: This will soon replace the Play Station Suite target - use this instead!!!!!
-'
 PSM_PATH="${PROGRAMFILES}\SCE\PSM"
 '--------------------
+
 '--------------------
 'MSBUILD path.
 '
 'Must be set for XNA and GLFW target support.
-'
-'Visual C++ 2010 Express is required for GLFW target support and is currently available here:
-'	http://www.microsoft.com/visualstudio/en-us/products/2010-editions/visual-cpp-express
-'
-'Visual C# 2010 Express and XNA 4.0 are requred for XNA target support and are currently available here:
-'	http://www.microsoft.com/visualstudio/en-us/products/2010-editions/visual-csharp-express
-'	http://www.microsoft.com/download/en/details.aspx?id=23714
 '
 MSBUILD_PATH="${WINDIR}\Microsoft.NET\Framework\v4.0.30319\MSBuild.exe"
 '--------------------

@@ -11,9 +11,11 @@ Const KLUDGE_INTERFACES:=True
 'To be used after reflection/semant immediately before translate
 '
 Function KludgeInterfaces( app:AppDecl )
-
+	'skn3: so in kludge interface we build a SUPER "_Object" that contains all interface methods
+	'each user Class in monkey extends from this super "_Object" so we need to make sure that
+	'overriding methods correctly determin if they need to be munged... i think?
+	
 	'find Object decl
-	'
 	Local odecl:ClassDecl
 	For Local decl:=Eachin app.allSemantedDecls
 		Local cdecl:=ClassDecl( decl )
@@ -84,11 +86,11 @@ Function KludgeInterfaces( app:AppDecl )
 					fdecl.scope=Null
 					idecl.InsertDecl fdecl
 					fdecl.attrs&=~DECL_ABSTRACT
-					If Not VoidType( fdecl.retType )
+					If Not VoidType(fdecl.retType)
 						Local expr:=New ConstExpr
 						expr.exprType=fdecl.retType
-						fdecl.AddStmt New ReturnStmt( expr )
-					Endif
+						fdecl.AddStmt New ReturnStmt(expr)
+					EndIf
 					'
 				Endif
 			Next
@@ -132,22 +134,32 @@ Function KludgeInterfaces( app:AppDecl )
 			For Local decl:=Eachin cdecl.Semanted
 				Local fdecl:=FuncDecl( decl )
 				If fdecl And fdecl.IsMethod() And Not fdecl.overrides
-					Local list:=imethods.Get( fdecl.ident )
+					Local list:= imethods.Get(fdecl.ident)
 					If list
 						For Local fdecl2:=Eachin list
-							If fdecl.EqualsFunc( fdecl2 )
-								fdecl.overrides=fdecl2
+							If fdecl.EqualsFunc(fdecl2)
+								fdecl.overrides = fdecl2
 								Exit
 							Endif
 						Next
-					Endif
+						
+						'if none found then we need to search again for matching name?
+						'is this ok, seems to work?
+						If Not fdecl.overrides
+							For Local fdecl2:= EachIn list
+								If fdecl.ident = fdecl2.ident and fdecl.EqualsArgs(fdecl2)
+									fdecl.overrides = fdecl2
+									Exit
+								Endif
+							Next
+						EndIf
+					EndIf
 				Endif
 			Next
 		Endif
 	Next
 	
 	app.mainModule.InsertDecl idecl
-
 	app.Semanted.AddFirst idecl
 	app.allSemantedDecls.AddFirst idecl
 	
@@ -251,12 +263,11 @@ Class BmxTranslator Extends CTranslator
 	End
 
 	'***** Declarations *****
-
-	Method TransStatic$( decl:Decl )
-		If decl.IsExtern()
+	Method TransStatic:String(decl:Decl)
+		If decl.IsExtern() And ModuleDecl( decl.scope )
 			Return decl.munged
-		Else If _env And decl.scope And decl.scope=_env.ClassScope
-			Return decl.munged
+		Else If _env And decl.scope And decl.scope=_env.ClassScope()
+			Return decl.scope.munged+"."+decl.munged
 		Else If ClassDecl( decl.scope )
 			Return decl.scope.munged+"."+decl.munged
 		Else If ModuleDecl( decl.scope )
@@ -297,8 +308,8 @@ Class BmxTranslator Extends CTranslator
 		Return TransStatic( decl )+TransArgs( args )
 	End
 	
-	Method TransSuperFunc$( decl:FuncDecl,args:Expr[] )
-		Return "super."+decl.munged+TransArgs( args )
+	Method TransSuperFunc:String(decl:FuncDecl, args:Expr[])
+		Return "super." + decl.munged + TransArgs(args)
 	End
 	
 	'***** Expressions *****
@@ -573,7 +584,8 @@ Class BmxTranslator Extends CTranslator
 
 		'string functions
 '		Case "fromchar" Return "String.fromCharCode"+Bra( arg0 )
-		Case "fromchar" Return "Chr"+Bra( arg0 )
+		Case "fromchar" Return "Chr" + Bra(arg0)
+		Case "fromchars" Return "string_from_chars" + Bra(arg0)
 
 		' ** TO-DO **
 		' BlitzMax angle stuff isnt proper, need to minus 90 I think from the angle!
@@ -908,11 +920,11 @@ Class BmxTranslator Extends CTranslator
 	End
 
 	Method Enquote$( str$ )
-		str=str.Replace( "~~","~~~~" )
-		str=str.Replace( "~q","~~q" )
-		str=str.Replace( "~n","~~n" )
-		str=str.Replace( "~r","~~r" )
-		str=str.Replace( "~t","~~t" )
+		str = str.Replace("~~", "~~~~")
+		str = str.Replace("~q", "~~q")
+		str = str.Replace("~n", "~~n")
+		str = str.Replace("~r", "~~r")
+		str = str.Replace("~t", "~~t")
 		
 		For Local i=0 Until str.Length
 			If str[i]>=32 And str[i]<128 Continue
@@ -1327,7 +1339,7 @@ Class BmxTranslator Extends CTranslator
 			Local c:Int = munged[i]
 			If c = "_1" Then
 				newmunged += "_1" + "_1"
-			Elseif c>=65 And c<=90 Then
+			ElseIf c >= 65 And c <= 90 Then
 				newmunged += "_1" + String.FromChar(c)
 			Else
 				newmunged += String.FromChar(c)
