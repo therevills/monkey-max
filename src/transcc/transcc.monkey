@@ -8,7 +8,7 @@ Import os
 Import trans
 Import builders
 
-Const VERSION:= "1.46 (monkey-max)"
+Const VERSION:="1.53 (monkey-max)"
 
 Function Main()
 	Local tcc:=New TransCC
@@ -121,7 +121,7 @@ Class Target
 		Self.name=name
 		Self.system=system
 		Self.builder=builder
-	end
+	End
 End
 
 Class TransCC
@@ -144,6 +144,7 @@ Class TransCC
 	
 	'config file
 	Field ANDROID_PATH:String
+	Field ANDROID_NDK_PATH:String
 	Field ANT_PATH:String
 	Field JDK_PATH:String
 	Field FLEX_PATH:String
@@ -328,6 +329,10 @@ Class TransCC
 				If Not ANDROID_PATH And FileType( path )=FILETYPE_DIR
 					ANDROID_PATH=path
 				Endif
+			Case "ANDROID_NDK_PATH"
+				If Not ANDROID_NDK_PATH And FileType( path )=FILETYPE_DIR
+					ANDROID_NDK_PATH=path
+				Endif
 			Case "JDK_PATH" 
 				If Not JDK_PATH And FileType( path )=FILETYPE_DIR
 					JDK_PATH=path
@@ -355,7 +360,7 @@ Class TransCC
 			Case "HTML_PLAYER" 
 				HTML_PLAYER=rhs
 			Case "FLASH_PLAYER" 
-				FLASH_PLAYER = rhs
+				FLASH_PLAYER=rhs
 			Case "BMAX_PATH"
 				If Not BMAX_PATH And FileType( path )=FILETYPE_FILE
 					BMAX_PATH=path
