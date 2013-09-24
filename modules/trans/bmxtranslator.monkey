@@ -962,7 +962,7 @@ Class BmxTranslator Extends CTranslator
 		If t.StartsWith( "EndIf" ) Or t.StartsWith( "EndFunction" ) Or t.StartsWith( "EndMethod" ) Or t.StartsWith( "EndType" ) Or t.StartsWith("Next") Or t.StartsWith("Else") Or t.StartsWith( "Wend" )
 			indent=indent[..indent.Length-1]
 		Endif
-		lines.AddLast indent+t
+		lines.Push indent+t
 		'code+=indent+t+"~n"
 		If t.EndsWith( "Then" ) Or t.StartsWith( "Function" ) Or t.StartsWith( "Method" ) Or t.StartsWith( "Type" ) Or t.StartsWith("For") Or t.StartsWith("Else") Or t.StartsWith("While")
 			indent+="~t"
