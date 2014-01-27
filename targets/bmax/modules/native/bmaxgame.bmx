@@ -3,6 +3,52 @@ Private
 Global _bmaxGame:BBBMaxGame
 Public
 
+?Win32
+Extern "Win32"
+	Function SHGetFolderPath:Int(hwndOwner:Byte Ptr, nFolder:Int, hToken:Byte Ptr, dwFlags:Int, pszPath:Short Ptr) = "SHGetFolderPathW@20"
+End Extern
+
+Const CSIDL_APPDATA:Int = $001A
+Const CSIDL_DESKTOPDIRECTORY:Int = $0010
+Const CSIDL_PERSONAL:Int = $0005
+Const CSIDL_PROFILE:Int = $0028
+
+Const SHGFP_TYPE_CURRENT:Int = 0
+?
+
+?MacOS
+Extern
+	Function FSFindFolder:Int( vRefNum:Int ,folderType:Int ,createFolder:Int ,foundRef:Byte Ptr )
+	Function FSRefMakePath:Int( ref:Byte Ptr,path:Byte Ptr, maxPath:Int )
+End Extern
+
+Const kUserDomain:Int = -32763
+Const kApplicationSupportFolderType:Int = Asc("a") Shl 24 | Asc("s") Shl 16 | Asc( "u") Shl 8 | Asc("p")
+
+Function getPath:String( folderType:Int )
+	Local buf:Byte[1024],ref:Byte[80]
+
+	If FSFindFolder( kUserDomain, folderType, False, ref ) Return Null
+	If FSRefMakePath( ref,buf,1024 ) Return Null
+		
+	Return String.FromCString( buf )
+End Function
+?
+
+Function GetUserDataFolder:String()
+	Local path$
+	?Win32
+	Local b:Short[] = New Short[MAX_PATH]
+'	Local ret:Int = SHGetFolderPath(Null, CSIDL_PERSONAL, Null, SHGFP_TYPE_CURRENT, b)
+	Local ret:Int = SHGetFolderPath(Null, CSIDL_APPDATA, Null, SHGFP_TYPE_CURRENT, b)
+	path$ = String.fromWString(b)
+	?
+	?MacOS
+	path$ = getPath( kApplicationSupportFolderType )
+	?
+	Return path$
+End Function
+
 Type BBBMaxGame Extends BBGame
 	Field dead:Int=False
 	Field suspended:Int=False
@@ -236,15 +282,18 @@ Type BBBMaxGame Extends BBGame
 		
 		Return 0
 	EndMethod
-	
+
 	Method SaveState:Int( State:String )
-		SaveText(state, ".monkeystate")
+        Local dir:String = GetUserDataFolder() + "/" + CFG_BMAX_WINDOW_TITLE
+        CreateDir( dir )
+		SaveText(state, dir + "/.monkeystate" )
 		Return 0
 	EndMethod
 	
 	Method LoadState:String()
+        Local file:String = GetUserDataFolder() + "/" + CFG_BMAX_WINDOW_TITLE + "/.monkeystate"
 		Try
-			Return LoadText(".monkeystate")
+			Return LoadText( file )
 		Catch ReadFail:Object
 			Return ""
 		EndTry
