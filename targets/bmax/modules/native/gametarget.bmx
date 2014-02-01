@@ -70,46 +70,49 @@ Type BBGame
 	
 	Method GetDate:Int( date:Int[] )
 		Local n:Int=date.Length
-		
-		If n>0
+
+        If n>0
 			'date
 			Local dateBits:String[] = CurrentDate().Split(" ")
+            
+            'year
+            date[0]=Int(dateBits[2])
+
+            If n>1
+
+                'month
+                Local month:String = dateBits[1].ToUpper()
+                Select month
+                    Case "JAN"
+                        date[1] = 1
+                    Case "FEB"
+                        date[1] = 2
+                    Case "MAR"
+                        date[1] = 3
+                    Case "APR"
+                        date[1] = 4
+                    Case "MAY"
+                        date[1] = 5
+                    Case "JUN"
+                        date[1] = 6
+                    Case "JUL"
+                        date[1] = 7
+                    Case "AUG"
+                        date[1] = 8
+                    Case "SEP"
+                        date[1] = 9
+                    Case "OCT"
+                        date[1] = 10
+                    Case "NOV"
+                        date[1] = 11
+                    Case "DEC"
+                        date[1] = 12
+                End Select
 			
-			'year
-			Select dateBits[2]
-				Case "JAN"
-					date[0] = 0
-				Case "FEB"
-					date[0] = 1
-				Case "MAR"
-					date[0] = 2
-				Case "APR"
-					date[0] = 3
-				Case "MAY"
-					date[0] = 4
-				Case "JUN"
-					date[0] = 5
-				Case "JUL"
-					date[0] = 6
-				Case "AUG"
-					date[0] = 7
-				Case "SEP"
-					date[0] = 8
-				Case "OCT"
-					date[0] = 9
-				Case "NOV"
-					date[0] = 10
-				Case "DEC"
-					date[0] = 11
-			End Select
-			
-			If n>1
-				'month
-				date[1]=Int(dateBits[1])
-				If n>2 
-					'day
-					date[2]=Int(dateBits[0])
-					If n>3 
+                If n>2
+                    'day
+                    date[2]=Int(dateBits[0])
+                    If n>3 
 						'time
 						Local timeBits:String[] = CurrentTime().Split(":")
 						'hours
@@ -125,9 +128,9 @@ Type BBGame
 								If n>6 date[6]=MilliSecs()
 							EndIf
 						EndIf
-					EndIf
-				EndIf
-			EndIf
+                    EndIf
+                EndIf
+            EndIf
 		EndIf
 	End Method
 	
