@@ -1,7 +1,7 @@
 ' ***** Start filestream.bmx ******
-Type BBFileStream Extends BBStream
+Type BBFileStream
 
-	Method Open:Int( path:String:String,mode )
+	Method Open:Int( path:String,mode:String )
 		If _stream<>Null Return False
 		
 		Local fmode:String
@@ -18,9 +18,6 @@ Type BBFileStream Extends BBStream
 		_stream=BBGame.Game().OpenFile( path,fmode )
 		If _stream=Null  Return False
 		
-		_position=_stream.Position
-		_length=_stream.Length
-		
 		Return True
 	End Method
 
@@ -29,40 +26,39 @@ Type BBFileStream Extends BBStream
 		
 		_stream.close()
 		_stream=Null
-		_position=0
-		_length=0
 	End Method
 	
 	Method Eof:Int()
 		If _stream=Null Return -1
 		
-		If _position=_length Return True
+		If Position()=Length() Return True
 		Return False
 	End Method
 	
 	Method Length:Int()
-		Return _length
+		If _stream=Null Return -1
+        Return _stream.Size()
 	End Method
 	
 	Method Position:Int()
-		Return _position
+		If _stream=Null Return -1
+        Return _stream.Pos()
 	End Method
 	
-	Method seek:Int(Position:Int)
+	Method seek:Int(Pos:Int)
 		Try
-			_stream.seek( Position)
-			_position=_stream.Pos()
+			_stream.seek(Pos)
 		Catch ex:Object
 		EndTry
-		Return _position
+		Return Position()
 	End Method
 		
-	Method read:Int( buffer:BBDataBuffer,Int offset:Int,Count:Int )
+	Method read:Int( buffer:BBDataBuffer,offset:Int,Count:Int )
 		If _stream=Null Return 0
 
 		Try
-			Local:Int n=_stream.read( buffer._data,offset,Count )
-			_position:+n
+            seek(offset)
+			Local n:Int=_stream.read( Varptr buffer._data,Count )
 			Return n
 		Catch ex:Object
 		EndTry
@@ -73,18 +69,15 @@ Type BBFileStream Extends BBStream
 		If _stream=Null Return 0
 		
 		Try
-			_stream.write( buffer._data,offset,Count );
-			_position+=Count;
-			If( _position>_length ) _length=_position;
-			Return Count;
+            seek(offset)
+			Local n:int=_stream.write( buffer._data,Count );
+			Return n;
 		Catch ex:Object
 		EndTry
 		Return 0
 	End Method
 
 	Field _stream:TStream
-	Field _position:Int
-	Field _length:Int
 End Type
 ' ***** End filestream.bmx ******
 

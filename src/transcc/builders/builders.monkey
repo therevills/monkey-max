@@ -9,7 +9,7 @@ Import html5
 Import ios
 Import psm
 Import stdcpp
-Import win8
+Import winrt
 Import xna
 Import bmax
 
@@ -24,7 +24,7 @@ Function Builders:StringMap<Builder>( tcc:TransCC )
 	builders.Set "flash",New FlashBuilder( tcc )
 	builders.Set "psm",New PsmBuilder( tcc )
 	builders.Set "stdcpp",New StdcppBuilder( tcc )
-	builders.Set "win8",New Win8Builder( tcc )
+	builders.Set "winrt",New WinrtBuilder( tcc )
 	builders.Set "xna",New XnaBuilder( tcc )
 	builders.Set "bmax",New BMaxBuilder( tcc )
 	
