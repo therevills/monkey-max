@@ -580,7 +580,7 @@ Class BmxTranslator Extends CTranslator
 		Case "contains" Return texpr+".Contains"+Bra( arg0 )
 		Case "startswith" Return texpr+".StartsWith"+Bra( arg0 )
 		Case "endswith" Return texpr+".EndsWith"+Bra( arg0 )
-		Case "tochars" Return texpr+"ToCString()"
+		Case "tochars" Return texpr+".ToCString()"
 
 		'string functions
 '		Case "fromchar" Return "String.fromCharCode"+Bra( arg0 )

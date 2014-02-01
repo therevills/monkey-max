@@ -4,11 +4,10 @@
 ' Placed into the public domain 24/02/2011.
 ' No warranty implied; use at your own risk.
 
-Import os
 Import trans
 Import builders
 
-Const VERSION:="1.53 (monkey-max)"
+Const VERSION:="1.60 (monkey-max)"
 
 Function Main()
 	Local tcc:=New TransCC
@@ -42,11 +41,9 @@ Function ReplaceEnv:String( str:String )
 		Endif
 		
 		Local t:=str[i+2..e]
-		
-		Local v:=GetCfgVar(t)
+
+		Local v:=GetConfigVar(t)
 		If Not v v=GetEnv(t)
-		
-'		v=v.Replace( "~q","" )
 		
 		bits.Push str[..i]
 		bits.Push v
@@ -79,35 +76,42 @@ Function ReplaceBlock:String( text:String,tag:String,repText:String,mark:String=
 	Return text[..i]+repText+text[i2..]
 End
 
+Function MatchPathAlt:Bool( text:String,alt:String )
+
+	If Not alt.Contains( "*" ) Return alt=text
+	
+	Local bits:=alt.Split( "*" )
+	If Not text.StartsWith( bits[0] ) Return False
+
+	Local n:=bits.Length-1
+	Local i:=bits[0].Length
+	For Local j:=1 Until n
+		Local bit:=bits[j]
+		i=text.Find( bit,i )
+		If i=-1 Return False
+		i+=bit.Length
+	Next
+
+	Return text[i..].EndsWith( bits[n] )
+End
+
 Function MatchPath:Bool( text:String,pattern:String )
 
 	text="/"+text
 	Local alts:=pattern.Split( "|" )
+	Local match:=False
 
 	For Local alt:=Eachin alts
 		If Not alt Continue
 		
-		Local bits:=alt.Split( "*" )
-		
-		If bits.Length=1
-			If bits[0]=text Return True
-			Continue
+		If alt.StartsWith( "!" )
+			If MatchPathAlt( text,alt[1..] ) Return False
+		Else
+			If MatchPathAlt( text,alt ) match=True
 		Endif
-		
-		If Not text.StartsWith( bits[0] ) Continue
-
-		Local i:=bits[0].Length
-		For Local j=1 Until bits.Length-1
-			Local bit:=bits[j]
-			i=text.Find( bit,i )
-			If i=-1 Exit
-			i+=bit.Length
-		Next
-
-		If i<>-1 And text[i..].EndsWith( bits[bits.Length-1] ) Return True
 	Next
-
-	Return False
+	
+	Return match
 End
 
 Class Target
@@ -167,9 +171,12 @@ Class TransCC
 
 		Self.args=args
 	
-		monkeydir=RealPath( ExtractDir( AppPath )+"/.." )
-	
 		Print "TRANS monkey compiler V"+VERSION
+	
+		monkeydir=RealPath( ExtractDir( AppPath )+"/.." )
+
+		SetEnv "MONKEYDIR",monkeydir
+		SetEnv "TRANSDIR",monkeydir+"/bin"
 	
 		ParseArgs
 		
@@ -178,7 +185,6 @@ Class TransCC
 		EnumBuilders
 		
 		EnumTargets "targets"
-		If _targets.IsEmpty() EnumTargets "targets2"	'delete me...
 		
 		If args.Length<2
 			Local valid:=""
@@ -204,26 +210,31 @@ Class TransCC
 	End
 	
 	Method EnumTargets:Void( dir:String )
-		Local t:=_cfgVars
-		Local p:=monkeydir+"/"+dir	'"/targets"
+	
+		Local p:=monkeydir+"/"+dir
+		
 		For Local f:=Eachin LoadDir( p )
 			Local t:=p+"/"+f+"/TARGET.MONKEY"
 			If FileType(t)<>FILETYPE_FILE Continue
-			_cfgVars=New StringMap<String>
+			
+			PushConfigScope
+			
 			PreProcess t
 			
-			Local name:=GetCfgVar( "TARGET_NAME" )
-			If Not name Continue
+			Local name:=GetConfigVar( "TARGET_NAME" )
+			If name
+				Local system:=GetConfigVar( "TARGET_SYSTEM" )
+				If system
+					Local builder:=_builders.Get( GetConfigVar( "TARGET_BUILDER" ) )
+					If builder
+						_targets.Set name,New Target( f,name,system,builder )
+					Endif
+				Endif
+			Endif
 			
-			Local system:=GetCfgVar( "TARGET_SYSTEM" )
-			If Not system Continue
+			PopConfigScope
 			
-			Local builder:=_builders.Get( GetCfgVar( "TARGET_BUILDER" ) )
-			If Not builder Continue
-			
-			_targets.Set name,New Target( f,name,system,builder )
 		Next
-		_cfgVars=t
 	End
 	
 	Method ParseArgs:Void()
@@ -278,7 +289,7 @@ Class TransCC
 					Die "Unrecognized command line option: "+arg
 				End
 			Else If arg.StartsWith( "+" )
-				SetCfgVar arg[1..],rhs
+				SetConfigVar arg[1..],rhs
 			Else
 				Die "Command line arg error: "+arg
 			End
@@ -297,10 +308,7 @@ Class TransCC
 		If FileType( cfgpath )<>FILETYPE_FILE Die "Failed to open config file"
 	
 		Local cfg:=LoadString( cfgpath )
-		
-		SetCfgVar "MONKEYDIR",monkeydir
-		SetCfgVar "TRANSDIR",monkeydir+"/bin"
-	
+			
 		For Local line:=Eachin cfg.Split( "~n" )
 		
 			line=line.Trim()
@@ -380,7 +388,8 @@ Class TransCC
 			If JDK_PATH path+=";"+JDK_PATH+"/bin"
 			If ANT_PATH path+=";"+ANT_PATH+"/bin"
 			If FLEX_PATH path+=";"+FLEX_PATH+"/bin"
-			If MINGW_PATH path=MINGW_PATH+"/bin;"+path
+			
+			If MINGW_PATH path=MINGW_PATH+"/bin;"+path	'override existing mingw path if any...
 	
 			SetEnv "PATH",path
 			
@@ -392,6 +401,7 @@ Class TransCC
 			
 			If ANDROID_PATH path+=":"+ANDROID_PATH+"/tools"
 			If ANDROID_PATH path+=":"+ANDROID_PATH+"/platform-tools"
+			If ANT_PATH path+=":"+ANT_PATH+"/bin"
 			If FLEX_PATH path+=":"+FLEX_PATH+"/bin"
 			
 			SetEnv "PATH",path
@@ -408,8 +418,6 @@ Class TransCC
 			
 		End
 		
-		SetCfgVar "TRANSDIR",""
-		SetCfgVar "MONKEYDIR",""
 	End
 	
 	Method Execute:Bool( cmd:String,failHard:Bool=True )
