@@ -131,7 +131,7 @@ Function DeleteDir( path$,recursive? )
 	Return DeleteDir( path )
 End
 
-#elseif TARGET="bmax"
+#If TARGET="bmax"
 
 	Import "native/os.bmx"
 
