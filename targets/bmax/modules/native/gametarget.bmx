@@ -168,7 +168,23 @@ Type BBGame
 	
 	Method OpenURL( url:String )
 	End Method
-	
+
+	Method GetDisplayModes:BBDisplayMode[]()
+		Return New BBDisplayMode[0]
+	End Method
+
+	Method GetDesktopMode:BBDisplayMode()
+		Return Null
+	End Method
+
+	Method GetDeviceWidth:Int()
+		Return bb_framework__1D_1E_1V_1I_1C_1E__1W_1I_1D_1T_1H
+	End Method
+
+	Method GetDeviceHeight:Int()
+		Return bb_framework__1D_1E_1V_1I_1C_1E__1H_1E_1I_1G_1H_1T
+	End Method
+
 	Method SetMouseVisible( visible:Int )
 	End Method
 	

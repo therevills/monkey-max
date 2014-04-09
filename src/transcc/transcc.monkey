@@ -7,7 +7,7 @@
 Import trans
 Import builders
 
-Const VERSION:="1.60 (monkey-max)"
+Const VERSION:="1.66 (monkey-max)"
 
 Function Main()
 	Local tcc:=New TransCC
@@ -145,6 +145,7 @@ Class TransCC
 	Field opt_casedcfg:String
 	Field opt_target:String
 	Field opt_modpath:String
+	Field opt_builddir:String
 	
 	'config file
 	Field ANDROID_PATH:String
@@ -203,6 +204,15 @@ Class TransCC
 		target.builder.Make
 	End
 
+	Method GetReleaseVersion:String()
+		Local f:=LoadString( monkeydir+"/VERSIONS.TXT" )
+		For Local t:=Eachin f.Split( "~n" )
+			t=t.Trim()
+			If t.StartsWith( "***** v" ) And t.EndsWith( " *****" ) Return t[6..-6]
+		Next
+		Return ""
+	End
+	
 	Method EnumBuilders:Void()
 		For Local it:=Eachin Builders( Self )
 			If it.Value.IsValid() _builders.Set it.Key,it.Value
@@ -285,6 +295,8 @@ Class TransCC
 					opt_target=rhs
 				Case "-modpath"
 					opt_modpath=rhs
+				Case "-builddir"
+					opt_builddir=rhs
 				Default
 					Die "Unrecognized command line option: "+arg
 				End
