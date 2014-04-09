@@ -38,7 +38,7 @@ Private
 	
 	Method _New:Bool( length:Int )
 	Method _Load:Bool( path:String )
-	Method _LoadAsync:Void( path:String,thread:BBThread )
+	Method _LoadAsync:Void( path:String,thread:Thread )
 
 End
 
@@ -64,14 +64,14 @@ Class AsyncDataLoader Extends Thread Implements IAsyncEventSource
 	Field _onComplete:IOnLoadDataComplete
 
 	Method Run__UNSAFE__:Void()
-		_data._LoadAsync( _path,Self )
+		_data._LoadAsync( Strdup(_path),Self )
 	End
 		
 	Method UpdateAsyncEvents:Void()
 		If IsRunning() Return
 		RemoveAsyncEventSource Self
 		_onComplete.OnLoadDataComplete( DataBuffer( Result() ),_path )
-	End		
+	End
 	
 End
 

@@ -49,6 +49,22 @@ Function GetUserDataFolder:String()
 	Return path$
 End Function
 
+Type BBDisplayMode
+	Field width:Int
+	Field height:Int
+	Field format:Int
+	Field hertz:Int
+	Field flags:Int
+
+	Method New(width:Int, height:Int, format:Int, hertz:Int, flags:Int)
+		Self.width = width
+		Self.height = height
+		Self.format = format
+		Self.hertz = hertz
+		Self.flags = flags
+	End Method
+End Type
+
 Type BBBMaxGame Extends BBGame
 	Field dead:Int=False
 	Field suspended:Int=False
@@ -139,6 +155,7 @@ Type BBBMaxGame Extends BBGame
 				PollInput()
 				
 				UpdateGame()
+'				Exit
 				
 				If Not updatePeriod Exit
 				If updateNext > .MilliSecs()
@@ -310,7 +327,7 @@ Type BBBMaxGame Extends BBGame
 			HideMouse()
 		EndIf
 	End Method
-	
+
 	Method PathToFilePath:String(path:String)
 		'before coding this I wonder if this replaces teh old FixDataPath() function???
 		If path.StartsWith( "monkey:" ) = False

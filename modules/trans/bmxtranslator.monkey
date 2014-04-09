@@ -40,7 +40,8 @@ Function KludgeInterfaces( app:AppDecl )
 	
 	'find all interfaces/methods
 	'
-	Local ifaces:=New List<ClassDecl>
+'	Local ifaces:=New List<ClassDecl>
+	Local ifaces:=New StringSet
 	Local icasts:=New StringMap<FuncDecl>
 	Local imethods:=New StringMap<List<FuncDecl>>
 
@@ -49,6 +50,9 @@ Function KludgeInterfaces( app:AppDecl )
 		Local cdecl:=ClassDecl( decl )
 		
 		If cdecl And cdecl.IsInterface()
+
+			If ifaces.Contains( cdecl.ident ) Continue
+			ifaces.Insert cdecl.ident
 
 			'create 'To' casting method...
 			'

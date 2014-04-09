@@ -24,7 +24,6 @@ Type gxtkGraphics
 	
 	'events
 	Method BeginRender:Int()
-		
 		Return 1
 	EndMethod
 	
