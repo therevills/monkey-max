@@ -334,8 +334,15 @@ Type BBBMaxGame Extends BBGame
 			Return path
 			
 		ElseIf path.StartsWith( "monkey://data/" )
+' If you want to have the data directory inside the Mac app
+'?Win32
 			Return "./data/"+path[14..]
-			
+'?
+'?MacOS
+'			Local f:String = AppFile
+'			f = Left( f, f.Length - 16 )
+'			Return f + "/Resources/data/"+path[14..]
+'?			
 		ElseIf path.StartsWith( "monkey://internal/" )
 			Return "./internal/"+path[18..]
 			
