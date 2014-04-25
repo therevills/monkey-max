@@ -215,7 +215,7 @@ Type BBGame
 					
 				Case "r+","rb+"
 					'read only, must exist
-					stream = .OpenFile(path)
+					stream = .OpenFile(path,True,False)
 					
 				Case "w+","wb+"
 					'write an empty file
