@@ -13,6 +13,7 @@ Function DrawTexturedPoly( image:TImage,xyuv#[],frame:Int=0, vertex:Int = -1)
     
 	Assert Image, "Image not found"
 
+?Win32
 	Local D3DDriver9:TD3D9Max2DDriver = TD3D9Max2DDriver(_max2dDriver)
 	If D3DDriver9 Then 
 		DrawTexturedPolyD3D9 ..
@@ -29,6 +30,7 @@ Function DrawTexturedPoly( image:TImage,xyuv#[],frame:Int=0, vertex:Int = -1)
 			 xyuv, handle_x, handle_y, origin_x,origin_y, vertex*4
 		Return
 	End If
+?
 	Local  OGLDriver:TGLMax2DDriver = TGLMax2DDriver(_max2dDriver)
 	If OGLDriver Then
 			DrawTexturedPolyOGL ..
@@ -39,6 +41,7 @@ Function DrawTexturedPoly( image:TImage,xyuv#[],frame:Int=0, vertex:Int = -1)
 	End If
 End Function
 
+?Win32
 Function DrawTexturedPolyD3D9( Driver:TD3D9Max2DDriver,  Frame:TD3D9ImageFrame,xyuv#[],handlex#,handley#,tx#,ty# , vertex:Int)
 	If xyuv.length<6 Return
 	Local segs:Int=xyuv.length/4
@@ -102,7 +105,7 @@ Function DrawTexturedPolyD3D( Driver:TD3D7Max2DDriver,  Frame:TD3D7ImageFrame,xy
 	Driver.SetActiveFrame Frame
 	Driver.device.DrawPrimitive(D3DPT_TRIANGLEFAN,D3DFVF_XYZ| D3DFVF_DIFFUSE | D3DFVF_TEX1,uv,segs,0)
 End Function
-
+?
 Function DrawTexturedPolyOGL (Driver:TGLMax2DDriver, Frame:TGLImageFrame, xy#[],handle_x#,handle_y#,origin_x#,origin_y#, vertex:Int) 
 	Private
 	Global TmpImage:TImage
